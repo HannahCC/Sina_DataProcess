@@ -30,7 +30,7 @@ public class GetPublicInfo {
 	static int WEIBO_NUMBER = 100;
 	static int[] LABELS = {1,2};//类别
 	static int ID_NUMBER = 500;//每类ID数量
-	static int[] TRAIN_ID_SIZE = {400/*640,480,320,160,80,40,20*/};//每类用户用于训练的ID数量。
+	static int[] TRAIN_ID_SIZE = {400,350,300,250,200,150,100};//每类用户用于训练的ID数量。
 	static int TEST_ID_SIZE = ID_NUMBER/FOLD;//每类用户用于测试的ID数量。
 	
 	static Map<ClassiferNode,Map<String,String>> CLASSIFERS_USER_MAP = null;
@@ -387,14 +387,16 @@ public class GetPublicInfo {
 			/*classnode.setTrainning_id_set(i);
 			SaveInfo.id_writer(PUBLIC_INFO+i+"\\400_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
 			*/ 
-			for(int n=1;n<FOLD;n++){  
+			
+			/*for(int n=1;n<FOLD;n++){  
 				classnode.setTrainning_id_set_byfold(i, n);
 				SaveInfo.id_writer(PUBLIC_INFO+i+"\\"+n+"00_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
-			}
-			/*for(int size : TRAIN_ID_SIZE){  
+			}*/
+			
+			for(int size : TRAIN_ID_SIZE){  
 				classnode.setTrainning_id_set_bynum(i, size);
 				SaveInfo.id_writer(PUBLIC_INFO+i+"\\"+size+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
-			}*/
+			}
 		}
 	}
 	/**

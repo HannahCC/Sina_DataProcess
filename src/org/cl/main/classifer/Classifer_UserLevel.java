@@ -26,53 +26,50 @@ public class Classifer_UserLevel {
 	static boolean CHI_FLAG = false;//是否使用CHI筛选特征
 	static boolean TFIDF_FLAG = false;//是否使用TFIDF表示特征,false时只用tf,true用tfidf
 	static int[] labels = {1,2};
-	static int[] train_id_size = {400,300,200,100}; 
-	static String res_dir = "Simple_vecAll_sample10000_d128_line9_desc_tag_avg_18w\\";
+	static int[] train_id_size = {400,350,300,250,200,150,100}; 
+	static String res_dir = "Simple_vecAll_line_Trainsize\\";
 	public static void main(String[] args) throws IOException{
-
 		List<String> classifers = new ArrayList<String>();
-
+		
 		/*Config.SrcPath_Root = args[0];
 		Config.ResPath_Root = args[1];
-		res_dir = args[2];
-		for(int i=3;i<args.length;i++){
-			classifers.add(args[i]);
-		}*/
-
+		res_dir = args[2];*/
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		Services.CHI_FLAG = CHI_FLAG;
 		Services.TFIDF_FLAG = TFIDF_FLAG;
 		
+		/*for(int i=3;i<args.length;i++){
+			classifers.add(args[i]);
+		}*/
+		//classifers.add("Feature_UserInfo\\Tag");
+		//classifers.add("Feature_UserInfo\\Description2");
+		//classifers.add("Feature_UserInfo\\Description3");
+		//classifers.add("Feature_UserInfo\\Description");
 		//classifers.add("Feature_UserInfo\\Description_ConcVecIn18w");
-		classifers.add("Feature_Relation\\Line9_Desc_Tag_Avg_18w_vec_all");
-		
-		//"Feature_Relation\\Line6_desc_tag_Conc_18w_vec_all",
-		//"Feature_Relation\\FriType",
-		//"Feature_Relation\\FriFolType",
-		//"Feature_Relation\\Fri_Fol_Description_withself",
-		//"Feature_Relation\\Fri_Fol_Description",
-		//"Feature_Style\\Acronym",
-		//"Feature_Style\\Buzz",
-		//"Feature_Style\\Emotion",
-		//"Feature_Style\\Modal",
-		//"Feature_Style\\Punt",
-		//"Feature_SRC\\AppType",
-		//"Feature_SRC\\MobileType",
-		//"Feature_Textual\\Text"
-		//"Feature_Textual\\POS"
-		//"Feature_UserInfo\\Tag",
-		//"Feature_UserInfo\\Description2"
-		//"Feature_UserInfo\\Description3"
-		//"Feature_UserInfo\\Description"
+		classifers.add("Feature_Relation\\Line_vec_all");
+		//classifers.add("Feature_Relation\\Line6_desc_tag_Conc_18w_vec_all");
+		//classifers.add("Feature_Relation\\FriType");
+		//classifers.add("Feature_Relation\\FriFolType");
+		//classifers.add("Feature_Relation\\Fri_Fol_Description_withself");
+		//classifers.add("Feature_Relation\\Fri_Fol_Description");
+		//classifers.add("Feature_Style\\Acronym");
+		//classifers.add("Feature_Style\\Buzz");
+		//classifers.add("Feature_Style\\Emotion");
+		//classifers.add("Feature_Style\\Modal");
+		//classifers.add("Feature_Style\\Punt");
+		//classifers.add("Feature_SRC\\AppType");
+		//classifers.add("Feature_SRC\\MobileType");
+		//classifers.add("Feature_Textual\\Text"
+		//classifers.add("Feature_Textual\\POS"
 		Map<ClassiferNode,Map<String,String>> classifer_user_map = ReadInfo.getMap(classifers,"_feature.txt");
 		Services.classifer_user_map = classifer_user_map;
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
-		cross_validation(fold);
+		//cross_validation(fold);
 		/*---------------------------------比较不同chi取值的情况---------------------------------*/
 		//allLabel_varCHI();
 		/*---------------------------------diff_train_id_size--------------------------------*/
-		//allLabel_varTrainSize();
+		allLabel_varTrainSize();
 		/*-----------------------------------1vs1--------------------------------------------*/
 		//OnevsOne();
 		/*-----------------------------------1vs1-varCHI-------------------------------------*/
@@ -92,6 +89,7 @@ public class Classifer_UserLevel {
 				Services.getIDF(0,"");
 				Services.getIDF(1,"");
 			}
+			
 			for(int li=1;li<=labels.length;li++){
 				int labelid = labels[li-1];
 				SaveInfo.saveResult("--------------label-"+labelid+"-------------");

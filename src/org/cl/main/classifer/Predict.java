@@ -39,7 +39,7 @@ public class Predict {
 		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
 		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
 		};*/
-		String[] classifers = {"Simple_vecAll_sample10000_d128_line9_desc_tag_avg_18w"};
+		String[] classifers = {"Simple_Neighbour_CommonFol","Simple_Neighbour_CommonFri","Simple_Neighbour_CommonFriFol"};
 		for(String classifer : classifers){
 		/*Config.ResPath_Root = args[0];
 		type = args[1];
@@ -51,9 +51,9 @@ public class Predict {
 			singlePredict("",0,5);
 			singleGetF1("",0,5);
 			//singleGetUserNoFeature("",0,5);
-			/*doubleTrain("",0,4,0,5);
-			doublePredict("",0,4,0,5);
-			doubleGetF1("",0,4,0,5);*/
+			/*doubleTrain("",0,7,0,5);
+			doublePredict("",0,7,0,5);
+			doubleGetF1("",0,7,0,5);*/
 			//doubleGetUserNoFeature("",0,19,0,5);
 			/*tribleTrain(0,10,0,6,0,5);
 			triblePredict(0,10,0,6,0,5);

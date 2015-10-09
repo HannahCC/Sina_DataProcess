@@ -113,7 +113,7 @@ public class ClassNode {
 	}
 
 	//从id_set_list选第i组以外 选num组作为训练ID
-	public void setTrainning_id_set_byfold(int i,int fold) {
+	public void setTrainning_id_set_byfold(int i,int num) {
 		this.trainning_id_set = new TreeSet<String>();
 		int n = 0;
 		for(int j=0;j<id_set_list.size();j++){
@@ -121,7 +121,7 @@ public class ClassNode {
 				merge(trainning_id_set,id_set_list.get(j));
 				n++;
 			}
-			if(n==fold)break;
+			if(n==num)break;
 		}
 	}
 	

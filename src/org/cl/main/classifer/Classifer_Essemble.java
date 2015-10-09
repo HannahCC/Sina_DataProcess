@@ -21,16 +21,16 @@ public class Classifer_Essemble {
 
 	static int fold = 5;
 	static int[] labels = {1,2};
-	static String[] classfiers = {/*"vecAll_sample10000_d128_line",*/"Tag_AvgVecIn18w",/*"Tag","Fri_Tag","Fol_Tag",*/
-		"Description_AvgVecIn18w"/*,"Description","Fri_Description","Fol_Description","ScreenName",*//*"Fri_Fol_Tag","Fri_Fol_Description"*/};
+	static String[] classfiers = {"vecAll_line","Tag_AvgVecIn18w","Tag","Fri_Tag","Fol_Tag",
+		"Description_AvgVecIn18w","Description","Fri_Description","Fol_Description"/*,"ScreenName","Fri_Fol_Tag","Fri_Fol_Description"*/};
 	static double[] weights = {1,1,1,1,1,1,1,1,1,1,1};//new double[10];
 	static String res_dir;
 	public static String type = "lg";
 	public static void main(String[] args) throws InterruptedException, IOException{
-		/*weights[0] = 0.9;
+		weights[0] = 0.1;
 		for(int j=1;j<classfiers.length;j++){
-			weights[j] = (1-weights[0])/6;
-		}*/
+			weights[j] = (1-weights[0])/8;
+		}
 		
 		res_dir = "MutiClassifer";
 		for(int j=0;j<classfiers.length;j++){

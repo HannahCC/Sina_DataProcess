@@ -9,6 +9,7 @@ public class ClassNode {
 	int classid = -1;
 	List<Set<String>>id_set_list = null;
 	Set<String> trainning_id_set = null;
+	Set<String> learning_id_set = null;
 	Set<String> testing_id_set = null;
 	Set<String> testing_id_set_fake = null;//tri_trainning是假设为test id 的unlabeled id集合
 	/*String test_data = null;
@@ -72,6 +73,12 @@ public class ClassNode {
 	}
 
 
+	public Set<String> getLearning_id_set() {
+		return learning_id_set;
+	}
+	public void setLearning_id_set(Set<String> learning_id_set) {
+		this.learning_id_set = learning_id_set;
+	}
 	public Set<String> getTesting_id_set() {
 		return testing_id_set;
 	}

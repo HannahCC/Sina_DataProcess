@@ -20,7 +20,8 @@ public class Classifer_WeiboLevel {
 	 */
 	static int fold = 5;
 	static int[] labels = {1,2,3,4};
-	static int[] train_id_size = {480,320,160,80,40,20,40};
+	static int[] train_id_size_arr = {400,350,300,250,200,150,100};
+	static int train_id_size = 400;
 	static int number_of_weibo = 100;//每个用户获取前100个微博的行为特征
 	static String res_dir = "Simple_vecAll\\";
 	public static void main(String[] args) throws IOException{
@@ -29,8 +30,7 @@ public class Classifer_WeiboLevel {
 		Map<String,Integer> classfiers = new HashMap<String,Integer>();
 		classfiers.put("Feature_Behaviour", 14);
 		Services.classifers_weibo_map = classfiers;
-		Services.train_id_size = 480;
-		Services.number_of_weibo = number_of_weibo;
+		Services.WEIBO_NUMBER = number_of_weibo;
 		/*---------------------------------diff_train_id_size---------------------------------*/
 		/*int k = 0;
 		for(int size : train_id_size){
@@ -52,11 +52,10 @@ public class Classifer_WeiboLevel {
 			SaveInfo.saveResult("------------------------fold-"+i+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+i+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			Services.fold_i = i;
 			for(int li=0;li<labels.length;li++){
 				int labelid = labels[li];
 				SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-				ClassNode classnode = Services.getTTID(labelid);
+				ClassNode classnode = Services.getTTID(i,train_id_size,labelid);
 				Services.getTTData_Behavior(li,classnode);
 			}
 		}
@@ -66,11 +65,10 @@ public class Classifer_WeiboLevel {
 			SaveInfo.saveResult("------------------------fold-"+i+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//"+i+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			Services.fold_i = i;
 			for(int li=0;li<labels.length;li++){
 				int labelid = labels[li];
 				SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-				ClassNode classnode = Services.getTTID(labelid);
+				ClassNode classnode = Services.getTTID(i,train_id_size,labelid);
 				Services.getTTData_Behavior(li,classnode);
 			}
 		}

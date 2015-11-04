@@ -10,14 +10,13 @@ import org.cl.utils.SaveInfo;
 
 public class Cmd_Predict {
 
-	public static double predict(String path,String test_id_file,String result_file,String type) {
-		String cmdStr = getCmdStr(path,test_id_file,result_file,type);
+	public static double predict(String path,String test_data_file,String result_file,String type) {
+		String cmdStr = getCmdStr(path,test_data_file,result_file,type);
 		double accuracy = execute(path,cmdStr);
 		return accuracy;
 	}
-	
 
-	public static double predict(String path,String type) {
+	public static double predict(String path, String type) {
 		String cmdStr = getCmdStr(path,"testing_data","result",type);
 		double accuracy = execute(path,cmdStr);
 		return accuracy;
@@ -56,7 +55,7 @@ public class Cmd_Predict {
 
 	private static String getCmdStr(String path, String test_data_file,String result_file,
 			String type) {
-		String save_path = Config.ResPath_Root+"SVM\\";
+		String save_path = Config.ResDir+"SVM\\";
 		String cmdStr = "";
 		if(type.equals("lg")){
 			cmdStr = "cmd /k "+save_path+"predict -b 1 "

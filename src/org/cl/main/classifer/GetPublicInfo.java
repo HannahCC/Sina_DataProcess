@@ -57,11 +57,11 @@ public class GetPublicInfo {
 		GetTTID.tmp_getTrain_TestID("82");
 		GetTTID.tmp_getTestID();*/
 		/*----获取各情况下UserID---------*/
-		for(int labelid : LABELS){
-			//获取UserId
+		/*for(int labelid : LABELS){
+			获取UserId
 			//getUserID("UserID\\",labelid);//获取每类用户ID各ID_NUMBER个放在USERID_ROOT目录下
 			//getUserIDWeibonumOverN(labelid);//获取每类CLASSFIERS特征都有的ID（通过getUserID()得到的ID）,且微博数超过WEIBO_NUMBER的用户,主要用户获取WeiboLevel特征时控制特征个数
-		}
+		}*/
 		
 		/*----获取各情况下的测试、训练ID组---------*/
 		for(int labelid : LABELS){
@@ -384,19 +384,19 @@ public class GetPublicInfo {
 			classnode.setTesting_id_set(i);
 			SaveInfo.id_writer(PUBLIC_INFO+i+"\\"+labelid+"_testingid"+".txt",classnode.getTesting_id_set());
 
-			/*classnode.setTrainning_id_set(i);
-			SaveInfo.id_writer(PUBLIC_INFO+i+"\\400_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
-			*/ 
+			classnode.setTrainning_id_set(i);
+			SaveInfo.id_writer(PUBLIC_INFO+i+"\\320_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
+			
 			
 			/*for(int n=1;n<FOLD;n++){  
 				classnode.setTrainning_id_set_byfold(i, n);
 				SaveInfo.id_writer(PUBLIC_INFO+i+"\\"+n+"00_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
 			}*/
 			
-			for(int size : TRAIN_ID_SIZE){  
+			/*for(int size : TRAIN_ID_SIZE){  
 				classnode.setTrainning_id_set_bynum(i, size);
 				SaveInfo.id_writer(PUBLIC_INFO+i+"\\"+size+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
-			}
+			}*/
 		}
 	}
 	/**

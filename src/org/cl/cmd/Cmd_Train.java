@@ -15,16 +15,16 @@ public class Cmd_Train {
 	 * cmd /k start dir 会打开一个新窗口后执行dir指令，原窗口不会关闭。 
 	 * @param group
 	 */
-	public static void train(String path, String type) {
+	public static void train(String path, String type,String train_data_file) {
 		try {//svm-train .\1\training_data.txt
 			String cmdStr = "";
-			String svm_path = Config.ResPath_Root+"SVM\\";
+			String svm_path = Config.ResDir+"SVM\\";
 			if(type.equals("lg")){
-				cmdStr = "cmd /k "+svm_path+"train -s 0 "+path+"training_data.txt";;
+				cmdStr = "cmd /k "+svm_path+"train -s 0 "+path+train_data_file+".txt";;
 			}else if(type.equals("svm")){
-				cmdStr = "cmd /k "+svm_path+"svm-train "+path+"training_data.txt";
+				cmdStr = "cmd /k "+svm_path+"svm-train "+path+train_data_file+".txt";
 			}else if(type.equals("muti")){
-				cmdStr = "cmd /k "+svm_path+"svm_multiclass_learn -c 0.01 "+path+"training_data.txt "+path+"mutisvm_struct_model";
+				cmdStr = "cmd /k "+svm_path+"svm_multiclass_learn -c 0.01 "+path+train_data_file+".txt "+path+"mutisvm_struct_model";
 			}
 			Runtime run = Runtime.getRuntime(); 
 			Process process = run.exec(cmdStr);  

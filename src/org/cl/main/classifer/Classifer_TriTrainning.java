@@ -37,15 +37,13 @@ public class Classifer_TriTrainning {
 	static boolean CHI_FLAG = false;//是否使用CHI筛选特征
 	static boolean TFIDF_FLAG = false;//是否使用TFIDF表示特征,false时只用tf,true用tfidf
 	static int[] labels = {1,2};
-	static int[] train_id_size = {500};
+	static int train_id_size = 400;
 	static String[] classifers = null;
 	static String res_dir = "TriTraining_Line_Description_Tag_Incre150_iter5\\";
 	static StringBuffer log_buff = new StringBuffer();
 	public static void main(String[] args) throws IOException{
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
-		Services.CHI_FLAG = CHI_FLAG;
-		Services.TFIDF_FLAG = TFIDF_FLAG;
 		classifers = new String[]{
 				"Feature_Relation\\Fri_Fol_Description",
 				"Feature_Relation\\Fri_Fol_Tag",
@@ -53,16 +51,6 @@ public class Classifer_TriTrainning {
 		};
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
 		cross_validation(fold);
-		/*---------------------------------比较不同chi取值的情况---------------------------------*/
-		//allLabel_varCHI();
-		/*---------------------------------diff_train_id_size--------------------------------*/
-		//allLabel_varTrainSize();
-		/*-----------------------------------1vs1--------------------------------------------*/
-		//OnevsOne();
-		/*-----------------------------------1vs1-varCHI-------------------------------------*/
-		//OnevsOne_varCHI();
-		/*-----------------------------------1vsall------------------------------------------*/
-		//OnevsAll();
 		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt");
 		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt",log_buff);
 
@@ -74,9 +62,8 @@ public class Classifer_TriTrainning {
 			SaveInfo.mkdir(Config.ResPath);
 			SaveInfo.saveResult("-----------------------fold-"+i+"--------------------");
 			log_buff.append("-----------------------fold-"+i+"--------------------\r\n");
-			Services.fold_i = i;
 			//获取各classifer-label对应的训练、测试ID集合
-			Map<Integer, ClassNode> label_map = get_train_test_id();
+			Map<Integer, ClassNode> label_map = get_train_test_id(i);
 			//迭代训练预测过程，知道训练集数量达到
 			int train_id_size = 200;int iter = 0;
 			while(train_id_size<train_id_size_max&&iter<iter_max){
@@ -126,14 +113,14 @@ public class Classifer_TriTrainning {
 		double macroF1 = GetResult.getMacroF1Score(id_actual_res, id_predict_res);
 		return new double[]{accuracy,microF1,macroF1};
 	}
-	private static Map<Integer, ClassNode> get_train_test_id() throws IOException {
+	private static Map<Integer, ClassNode> get_train_test_id(int fold_i) throws IOException {
 		/*Map<String, Map<Integer, ClassNode>> classifer_label_map = new HashMap<String, Map<Integer, ClassNode>>();
 		for(String classifer : classifers){
 			String classifer_name = classifer.split("\\\\")[1].intern();*/
 		Map<Integer, ClassNode> label_map = new HashMap<Integer, ClassNode>();
 		for(int li=1;li<=labels.length;li++){
 			int labelid = labels[li-1];
-			ClassNode classnode = Services.getTTID_TriTraining(labelid);
+			ClassNode classnode = Services.getTTID_TriTraining(fold_i,train_id_size,labelid);
 			label_map.put(labelid, classnode);
 		}
 		return label_map;
@@ -263,18 +250,18 @@ public class Classifer_TriTrainning {
 			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter+"\\"+classifer_dir;
 			SaveInfo.mkdir(Config.ResPath);
 			if(TFIDF_FLAG){
-				Services.getIDF(0,"");
-				Services.getIDF(1,"");
+				Services.getIDF(i,train_id_size,0,"");
+				Services.getIDF(i,train_id_size,1,"");
 			}
 			for(int li=1;li<=labels.length;li++){
 				int labelid = labels[li-1];
 				SaveInfo.saveResult("------------"+classifer_name+"--label-"+labelid+"-------------");
-				if(CHI_FLAG)Services.getCHI(labelid,CHI_threshold,CHI_TYPE,"");
+				if(CHI_FLAG)Services.getCHI(i,train_id_size,labelid,CHI_threshold,CHI_TYPE,"");
 				ClassNode classnode = label_map.get(labelid);
 				Services.getTTData(li,classnode);
 			}
 			//Train and Predict
-			Cmd_Train.train(Config.ResPath,type);
+			Cmd_Train.train(Config.ResPath,type,"training_data");
 			double accuracy = Cmd_Predict.predict(Config.ResPath,type);//对unlabeled 进行预测
 			log_buff.append(Config.ResPath+"----"+accuracy+"\r\n");
 			Cmd_Predict.predict(Config.ResPath,"testing_data_fake","result_fake",type);//对实际ID进行预测

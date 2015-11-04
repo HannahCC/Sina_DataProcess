@@ -39,7 +39,7 @@ public class Predict {
 		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
 		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
 		};*/
-		String[] classifers = {"Simple_Neighbour_CommonFol","Simple_Neighbour_CommonFri","Simple_Neighbour_CommonFriFol"};
+		String[] classifers = {"Simple_Description","Simple_Fri_Fol_Description"};
 		for(String classifer : classifers){
 		/*Config.ResPath_Root = args[0];
 		type = args[1];
@@ -47,32 +47,33 @@ public class Predict {
 			String classifer = args[i];*/
 			
 			Config.ResPath = Config.ResPath_Root + classifer +"\\"; 
-			singleTrain("",0,5);
-			singlePredict("",0,5);
-			singleGetF1("",0,5);
-			//singleGetUserNoFeature("",0,5);
-			/*doubleTrain("",0,7,0,5);
-			doublePredict("",0,7,0,5);
-			doubleGetF1("",0,7,0,5);*/
-			//doubleGetUserNoFeature("",0,19,0,5);
-			/*tribleTrain(0,10,0,6,0,5);
-			triblePredict(0,10,0,6,0,5);
-			tribleGetF1(0,10,0,6,0,5);
-			tribleGetUserNoFeature(0,10,0,6,0,5);*/
-			SaveInfo.saveResult(Config.ResPath,"res.txt");
+			singleTrain("",0,5,"training_data");
+			singlePredict("",0,5,"testing_data","result");
+			singlePredict("",0,5,"learning_data","learning_result");
+			singleGetF1("",0,5,"testing_id","result");
+			//singleGetUserNoFeature("",0,5,"training_data","testing_data");
+			/*doubleTrain("",0,7,0,5,"training_data");
+			doublePredict("",0,7,0,5,"testing_data","result");
+			doubleGetF1("",0,7,0,5,"testing_id","result");*/
+			//doubleGetUserNoFeature("",0,19,0,5,"training_data","testing_data");
+			/*tribleTrain(0,10,0,6,0,5,"training_data");
+			triblePredict(0,10,0,6,0,5,"testing_data","result");
+			tribleGetF1(0,10,0,6,0,5,"testing_id","result");
+			tribleGetUserNoFeature(0,10,0,6,0,5,"training_data","testing_data");*/
+			//SaveInfo.saveResult(Config.ResPath,"res.txt");
 		}
 	}
-	public static void singleTrain(String dir, int s, int n) {
+	public static void singleTrain(String dir, int s, int n,String train_data_file) {
 		for(int i=0;i<n;i++){//train
 			String path = Config.ResPath+dir+(i+s)+"\\";
-			Cmd_Train.train(path,type);
+			Cmd_Train.train(path,type,train_data_file);
 		}
 	}	
-	public static void singlePredict(String dir, int s, int n){
+	public static void singlePredict(String dir, int s, int n,String test_data_file,String result_file){
 		double average = 0;
 		for(int i=0;i<n;i++){//train
 			String path = Config.ResPath+dir+(i+s)+"\\";
-			double accuracy = Cmd_Predict.predict(path,type);
+			double accuracy = Cmd_Predict.predict(path,test_data_file,result_file,type);
 			average+=accuracy;
 		}
 		if(isAverage){
@@ -80,16 +81,16 @@ public class Predict {
 			SaveInfo.saveResult(type+" accuracy average="+average);
 		}
 	}
-	public static void singleGetF1(String dir, int s, int n) throws IOException {
+	public static void singleGetF1(String dir, int s, int n,String test_id_file,String result_file) throws IOException {
 		double average1 = 0, average2 = 0;
 		for(int i=0;i<n;i++){//train
 			String path = Config.ResPath+dir+(i+s)+"\\";
 			Map<String,String> id_actual_res = new TreeMap<String, String>();
 			Map<String,ResultNode> id_predict_res = new TreeMap<String, ResultNode>();
 			// testing_id.txt testing_data.txt result_lg.txt 同一行为同一个用户
-			List<String> testing_id = ReadInfo.getList(path,"\\testing_id.txt","\\s",0);
-			GetResult.getActualRes(path,"\\testing_id.txt",testing_id,id_actual_res,"\\s",1);
-			GetResult.getPredictRes(path,"\\result_"+type+".txt",testing_id,id_predict_res,1);
+			List<String> testing_id = ReadInfo.getList(path,"\\"+test_id_file+".txt","\\s",0);
+			GetResult.getActualRes(path,"\\"+test_id_file+".txt",testing_id,id_actual_res,"\\s",1);
+			GetResult.getPredictRes(path,"\\"+result_file+"_"+type+".txt",testing_id,id_predict_res,1);
 			double micro_f1 = GetResult.getMicroF1Score(id_actual_res, id_predict_res);
 			double macro_f1 = GetResult.getMacroF1Score(id_actual_res, id_predict_res);
 			//SaveInfo.saveResult(Config.ResPath+dir+"---"+type+" MicroF1Score ="+micro_f1);
@@ -104,56 +105,56 @@ public class Predict {
 			SaveInfo.saveResult(Config.ResPath+dir+"---"+type+" MacroF1Score average="+average2);
 		}
 	}
-	public static void singleGetUserNoFeature(String dir,int s, int n) throws IOException {
+	public static void singleGetUserNoFeature(String dir,int s, int n,String train_data_file,String test_data_file) throws IOException {
 		int sum = 0;
 		for(int i=0;i<n;i++){
 			String path = Config.ResPath_Root+dir+(i+s)+"\\";
-			int num = ReadInfo.getUserNum(path, "training_data.txt", "\t", 1);
-			num += ReadInfo.getUserNum(path, "testing_data.txt", "\t", 1);
+			int num = ReadInfo.getUserNum(path, train_data_file, "\t", 1);
+			num += ReadInfo.getUserNum(path, test_data_file, "\t", 1);
 			sum+= num;
 		}
 		double avg = sum/(double)5;
 		SaveInfo.saveResult("User has no feature average="+avg);
 	}
 
-	public static void doubleTrain(String dir, int s1, int n1, int s2, int n2){
+	public static void doubleTrain(String dir, int s1, int n1, int s2, int n2,String train_data_file){
 		for(int i=0;i<n1;i++){//train
-			singleTrain(dir+(i+s1)+"\\",s2,n2);
+			singleTrain(dir+(i+s1)+"\\",s2,n2,train_data_file);
 		}
 	}
-	public static void doublePredict(String dir, int s1, int n1, int s2, int n2) {
+	public static void doublePredict(String dir, int s1, int n1, int s2, int n2,String test_data_file,String result_file) {
 		for(int i=0;i<n1;i++){//predict
-			singlePredict(dir+(i+s1)+"\\",s2,n2);
+			singlePredict(dir+(i+s1)+"\\",s2,n2,test_data_file,result_file);
 		}
 	}
-	public static void doubleGetUserNoFeature(String dir, int s1, int n1, int s2, int n2) throws IOException {
+	public static void doubleGetUserNoFeature(String dir, int s1, int n1, int s2, int n2,String test_data_file,String result_file) throws IOException {
 		for(int i=0;i<n1;i++){
-			singleGetUserNoFeature(dir+(i+s1)+"\\",s2,n2);
+			singleGetUserNoFeature(dir+(i+s1)+"\\",s2,n2,test_data_file,result_file);
 		}
 	}
-	public static void doubleGetF1(String dir, int s1, int n1, int s2, int n2) throws IOException {
+	public static void doubleGetF1(String dir, int s1, int n1, int s2, int n2,String test_data_file,String result_file) throws IOException {
 		for(int i=0;i<n1;i++){
-			singleGetF1(dir+(i+s1)+"\\",s2,n2);
+			singleGetF1(dir+(i+s1)+"\\",s2,n2,test_data_file,result_file);
 		}
 	}
-	public static void tribleTrain(int s1, int n1, int s2, int n2,int s3,int n3){
+	public static void tribleTrain(int s1, int n1, int s2, int n2,int s3,int n3,String train_data_file){
 		for(int i=0;i<n1;i++){//train
-			doubleTrain((i+s1)+"\\",s2,n2,s3,n3);
+			doubleTrain((i+s1)+"\\",s2,n2,s3,n3,train_data_file);
 		}
 	}
-	public static void triblePredict(int s1, int n1, int s2, int n2,int s3,int n3) {
+	public static void triblePredict(int s1, int n1, int s2, int n2,int s3,int n3,String test_data_file,String result_file) {
 		for(int i=0;i<n1;i++){//predict
-			doublePredict((i+s1)+"\\",s2,n2,s3,n3);
+			doublePredict((i+s1)+"\\",s2,n2,s3,n3,test_data_file,result_file);
 		}
 	}
-	public static void tribleGetUserNoFeature(int s1, int n1, int s2, int n2,int s3,int n3) throws IOException {
+	public static void tribleGetUserNoFeature(int s1, int n1, int s2, int n2,int s3,int n3,String test_data_file,String result_file) throws IOException {
 		for(int i=0;i<n1;i++){//predict
-			doubleGetUserNoFeature((i+s1)+"\\",s2,n2,s3,n3);
+			doubleGetUserNoFeature((i+s1)+"\\",s2,n2,s3,n3,test_data_file,result_file);
 		}
 	}
-	public static void tribleGetF1(int s1, int n1, int s2, int n2,int s3,int n3) throws IOException {
+	public static void tribleGetF1(int s1, int n1, int s2, int n2,int s3,int n3,String test_data_file,String result_file) throws IOException {
 		for(int i=0;i<n1;i++){//predict
-			doubleGetF1((i+s1)+"\\",s2,n2,s3,n3);
+			doubleGetF1((i+s1)+"\\",s2,n2,s3,n3,test_data_file,result_file);
 		}
 	}
 }

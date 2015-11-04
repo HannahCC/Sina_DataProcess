@@ -58,9 +58,12 @@ public class SaveInfo {
 			saveResult("*****************there is no feature!!************************");
 			return;
 		}
-		String data_filename = "testing_data.txt";String id_filename = "testing_id.txt";
-		if(type==1){data_filename = "training_data.txt";id_filename = "training_id.txt";}
-		if(type==2){data_filename = "testing_data_fake.txt";id_filename = "testing_id_fake.txt";}
+		String data_filename = "";String id_filename = "";
+		if(type==0){data_filename = "testing_data.txt";id_filename = "testing_id.txt";}
+		else if(type==1){data_filename = "training_data.txt";id_filename = "training_id.txt";}
+		else if(type==2){data_filename = "testing_data_fake.txt";id_filename = "testing_id_fake.txt";}
+		else if(type==3){data_filename = "learning_data.txt";id_filename = "learning_id.txt";}
+		else{saveResult("*****************data type is wrong!!************************");return;}
 		File f1 = new File(Config.ResPath+data_filename);
 		File f2 = new File(Config.ResPath+id_filename);
 		try {

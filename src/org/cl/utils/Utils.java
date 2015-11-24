@@ -20,8 +20,9 @@ import java.util.TreeSet;
 import java.util.Map.Entry;
 
 public class Utils {
+	static DecimalFormat df = new DecimalFormat("0.0000000000");
 	//将id_Set按比例ratio分成两个id_set 
-	public static List<Set<String>> spilt(Set<String> id_set, double ratio) {
+	public static List<Set<String>> spilt(Set<String> id_set, float ratio) {
 		int num = id_set.size();
 		int i_num = (int) (num*ratio);
 		List<Set<String>> id_set_list = new ArrayList<Set<String>>();
@@ -272,7 +273,7 @@ public class Utils {
 		}
 	}
 	//按降序排列
-	public static void mapSortByValue(List<String> list,Map<String,Double> map,final Map<String, Integer> additional_map, DecimalFormat df) {
+	public static void mapSortByValue(List<String> list,Map<String,Double> map,final Map<String, Integer> additional_map) {
 		List<Entry<String,Double>> list_tmp = new ArrayList<Entry<String,Double>>(map.entrySet());
 		Collections.sort(list_tmp,new Comparator<Entry<String,Double>>(){
 			public int compare(Entry<String,Double> arg0,Entry<String,Double> arg1) {

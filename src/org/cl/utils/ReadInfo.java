@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.cl.conf.Config;
-import org.cl.model.ClassiferNode;
-
 
 public class ReadInfo {
 	public static void getSet(String dir,String filename,Set<String> res) throws IOException {
@@ -112,50 +109,7 @@ public class ReadInfo {
 		r.close();
 		return res;
 	}
-	public static Map<ClassiferNode, Map<String, String>> getMap(List<String> classifers,String filename) throws IOException {
-		Map<ClassiferNode,Map<String, String>> classifer_stastic_map = new HashMap<ClassiferNode,Map<String, String>>();
-		for(String classifer : classifers){
-			ClassiferNode classifernode = new ClassiferNode();
-			classifernode.setClassifer_name(classifer.split("\\\\")[1]);
-			File f = new File(Config.SrcPath_Root+classifer+filename);
-			if(!f.exists()){
-				System.out.println(classifernode.getClassifer_name()+"has no feature!");
-				continue;
-			}
-			Map<String, String> res = new HashMap<String, String>();
-			BufferedReader r = new BufferedReader(new FileReader(f));
-			String line = "";
-			while((line = r.readLine())!=null){
-				if(line.equals("")||!line.contains(":"))continue;
-				String uid = line.split("\\s")[0];
-				res.put(uid,line.replace(uid, "").trim());
-			}
-			int size = getFeatureSize(classifernode.getClassifer_name());
-			classifernode.setClassifer_size(size);
-			SaveInfo.saveResult(classifernode.getClassifer_name()+"SIZE---:"+classifernode.getClassifer_size());
-			classifer_stastic_map.put(classifernode, res);
-			r.close();
-		}
-		return classifer_stastic_map;
-	}
-
-
-	public static int getFeatureSize(String classfier) throws IOException{
-		int size = 0;
-		File f = new File(Config.SrcPath_Root+"\\Config\\Dict_"+classfier+".txt");
-		if(!f.exists()){
-			System.out.println(classfier+"has not dict.we can't get the feature_size!");
-			return -1;
-		}
-		BufferedReader r = new BufferedReader(new FileReader(f));
-		String line = "";
-		while((line = r.readLine())!=null){
-			if(!line.equals(""))size=Integer.parseInt(line.split("\t")[1]);
-		}
-		r.close();
-		return size+1;//因为编号是从0开始，所以size+1
-	}
-	public static int getNum(String dir, String filename) throws IOException {
+	public static int getLineNum(String dir, String filename) throws IOException {
 		int size = 0;
 		File f = new File(dir+filename);
 		if(!f.exists())return 0;

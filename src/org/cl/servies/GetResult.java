@@ -1,4 +1,4 @@
-package org.cl.utils;
+package org.cl.servies;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,23 +9,55 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.cl.conf.Config;
 import org.cl.model.ResultNode;
+import org.cl.utils.ReadInfo;
+import org.cl.utils.SaveInfo;
 
 public class GetResult {
+	
 	/**
-	 * 获取结果文件  uid:UID:实际lable##预测label##预测置信度
+	 * 获取结果文件  UID:实际lable##预测label##预测置信度
 	 * @param i 
 	 * @return 
 	 * @throws IOException  
 	 */
-	public static Map<String, String> getResult(String path, String test_id_file, String test_data_file, String result_file,String type) throws IOException {
+	public static Map<String, String> getResult(String path, String test_id_file, String test_data_file, String result_file) throws IOException {
 		List<String> testing_id = ReadInfo.getList(path,"\\"+test_id_file+".txt","\\s",0);
 		Map<String,String> id_res = new TreeMap<String, String>();
-		getActualRes(path,"\\"+test_data_file+".txt",testing_id,id_res,"\t",0);
-		getPredictRes(path,"\\"+result_file+"_"+type+".txt",testing_id,id_res);
+		getActualRes(path,"\\"+test_data_file+".txt",testing_id,id_res,"\t",0);// UID:实际lable
+		
+		//UID:实际lable##[预测label##预测置信度]  为id_res增加[]内的内容
+		File f = new File(path,"\\"+result_file+"_"+Config.SVM_TYPE+".txt");
+		BufferedReader r = new BufferedReader(new FileReader(f));
+		String line = "";
+		int j = 0;
+		while((line = r.readLine())!=null){
+			if(line.equals(""))continue;
+			String[] item = line.split("\\s");
+			double support = Math.abs(Double.parseDouble(item[1])-Double.parseDouble(item[2]));
+			String id = testing_id.get(j++);
+			id_res.put(id,id_res.get(id)+"##"+item[0]+"##"+support);
+		}
+		r.close();
 		return id_res;
 	}
-
+	
+	public static double getEssembleResult(String fold_i, String src_dir, String res_dir, String dir,String[] classfiers) throws IOException {
+		String svm_type = Config.SVM_TYPE;
+		Map<String,String> id_actual_res = new TreeMap<String, String>();
+		Map<String,ResultNode> id_predict_res = new TreeMap<String, ResultNode>();
+		for(String classfier : classfiers){
+			// testing_id.txt testing_data.txt result_lg.txt 同一行为同一个用户
+			List<String> testing_id = ReadInfo.getList(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\testing_id.txt","\\s",0);
+			GetResult.getActualRes(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\testing_data.txt",testing_id,id_actual_res,"\t",0);
+			GetResult.getPredictRes(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\result_"+svm_type+".txt",testing_id,id_predict_res,1);
+		}
+		SaveInfo.result_writer(Config.ResPath_Root+res_dir+dir,"final_result_"+fold_i+"_"+svm_type+".txt","final_testing_id_"+fold_i+".txt",id_actual_res,id_predict_res);
+		double accuracy =  GetResult.getAccuracy(id_actual_res,id_predict_res);
+		SaveInfo.saveResult(Config.ResPath_Root+res_dir+dir+"final_result_"+fold_i+"_"+svm_type+"----"+accuracy);
+		return accuracy;
+	}
 	/**
 	 * 
 	 * @param dir   预测结果所在目录
@@ -112,30 +144,6 @@ public class GetResult {
 
 
 	/***********************************************************************************************************************************/
-	/**
-	 * 
-	 * @param dir   预测结果所在目录
-	 * @param filename   预测结果存放的文件
-	 * @param testing_id   预测结果对应的ID，ID顺序与结果文件相对应
-	 * @param id_res	uid:UID:实际lable
-	 * @throws IOException
-	 */
-	private static void getPredictRes(String dir, String filename,
-			List<String> testing_id, Map<String, String> id_res) throws IOException {
-		File f = new File(dir+filename);
-		BufferedReader r = new BufferedReader(new FileReader(f));
-		String line = "";
-		int j = 0;
-		while((line = r.readLine())!=null){
-			if(line.equals(""))continue;
-			String[] item = line.split("\\s");
-			double support = Math.abs(Double.parseDouble(item[1])-Double.parseDouble(item[2]));
-			String id = testing_id.get(j++);
-			id_res.put(id,id_res.get(id)+"##"+item[0]+"##"+support);
-		}
-		r.close();
-	}
-
 	/**
 	 * Auther: WangYi
 	 * CreatedAt:2015-9-2

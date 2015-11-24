@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.cl.conf.Config;
 import org.cl.model.ClassNode;
+import org.cl.servies.Cmd_Train;
+import org.cl.servies.GetTrainTestData;
+import org.cl.servies.GetTrainTestID;
 import org.cl.utils.SaveInfo;
-import org.cl.utils.Services;
 
 
 public class Classifer_WeiboLevel {
@@ -18,19 +20,13 @@ public class Classifer_WeiboLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static int fold = 5;
-	static int[] labels = {1,2,3,4};
-	static int[] train_id_size_arr = {400,350,300,250,200,150,100};
-	static int train_id_size = 400;
-	static int number_of_weibo = 100;//每个用户获取前100个微博的行为特征
 	static String res_dir = "Simple_vecAll\\";
 	public static void main(String[] args) throws IOException{
 		Config.ResPath = res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		Map<String,Integer> classfiers = new HashMap<String,Integer>();
 		classfiers.put("Feature_Behaviour", 14);
-		Services.classifers_weibo_map = classfiers;
-		Services.WEIBO_NUMBER = number_of_weibo;
+		GetTrainTestData.classifers_weibo_map = classfiers;
 		/*---------------------------------diff_train_id_size---------------------------------*/
 		/*int k = 0;
 		for(int size : train_id_size){
@@ -38,39 +34,23 @@ public class Classifer_WeiboLevel {
 			Config.ResPath = Config.ResPath_Root+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
 			Services.train_id_size = size;
-			cross_validation(fold,k);
+			cross_validation(k+"//");
 			k++;
 		}
 		*/
-		cross_validation(fold);
+		cross_validation("");
 		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt");
 	}
 	
 	
-	public static void cross_validation(int fold) throws IOException{
-		for(int i=0;i<fold;i++){
+	public static void cross_validation(String dir) throws IOException{
+		for(int i=0;i<Config.FOLD;i++){
 			SaveInfo.saveResult("------------------------fold-"+i+"--------------------");
-			Config.ResPath = Config.ResPath_Root+res_dir+i+"//";
+			Config.ResPath = Config.ResPath_Root+res_dir+dir+i+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			for(int li=0;li<labels.length;li++){
-				int labelid = labels[li];
-				SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-				ClassNode classnode = Services.getTTID(i,train_id_size,labelid);
-				Services.getTTData_Behavior(li,classnode);
-			}
-		}
-	}
-	public static void cross_validation(int fold,int k) throws IOException{
-		for(int i=0;i<fold;i++){
-			SaveInfo.saveResult("------------------------fold-"+i+"--------------------");
-			Config.ResPath = Config.ResPath_Root+res_dir+k+"//"+i+"//";
-			SaveInfo.mkdir(Config.ResPath);
-			for(int li=0;li<labels.length;li++){
-				int labelid = labels[li];
-				SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-				ClassNode classnode = Services.getTTID(i,train_id_size,labelid);
-				Services.getTTData_Behavior(li,classnode);
-			}
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
+			GetTrainTestData.getTTData_WeiboLevel(label_map);
+			Cmd_Train.train(Config.ResPath,"training_data");
 		}
 	}
 }

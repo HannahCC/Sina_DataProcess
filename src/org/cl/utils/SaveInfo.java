@@ -40,20 +40,7 @@ public class SaveInfo {
 			e.printStackTrace();
 		}
 	}
-	public static void saveResult(String res_dir,String res_file,StringBuffer additional_buff) {
-		try {
-			File res = new File(res_dir+res_file);
-			BufferedWriter resw = new BufferedWriter(new FileWriter(res,true));
-			resw.write(additional_buff.toString());
-			resw.flush();
-			resw.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
-	public static void data_writer(int lableid_index, Map<String,StringBuffer> id_feature,int type) {
+	public static void data_writer(int labelid, Map<String,StringBuffer> id_feature,int type) {
 		if(id_feature==null||id_feature.size()==0){
 			saveResult("*****************there is no feature!!************************");
 			return;
@@ -72,8 +59,8 @@ public class SaveInfo {
 			Iterator<Entry<String, StringBuffer>> it = id_feature.entrySet().iterator();
 			while(it.hasNext()){
 				Entry<String, StringBuffer> entry = it.next();
-				w1.write(lableid_index+"\t"+entry.getValue().toString()+"\r\n");
-				w2.write(entry.getKey()+"\t"+lableid_index+"\r\n");
+				w1.write(labelid+"\t"+entry.getValue().toString()+"\r\n");
+				w2.write(entry.getKey()+"\t"+labelid+"\r\n");
 			}
 			w1.flush();w1.close();
 			w2.flush();w2.close();

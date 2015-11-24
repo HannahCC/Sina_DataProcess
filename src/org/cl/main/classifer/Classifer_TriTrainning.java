@@ -5,18 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-
-import org.cl.cmd.Cmd_Predict;
-import org.cl.cmd.Cmd_Train;
 import org.cl.conf.Config;
 import org.cl.model.ClassNode;
-import org.cl.model.ClassiferNode;
-import org.cl.model.ResultNode;
-import org.cl.utils.GetResult;
-import org.cl.utils.ReadInfo;
+import org.cl.servies.Cmd_Predict;
+import org.cl.servies.Cmd_Train;
+import org.cl.servies.GetCHI;
+import org.cl.servies.GetIDF;
+import org.cl.servies.GetResult;
+import org.cl.servies.GetTrainTestData;
+import org.cl.servies.GetTrainTestID;
+import org.cl.servies.GetUserFeature;
 import org.cl.utils.SaveInfo;
-import org.cl.utils.Services;
 import org.cl.utils.Utils;
 
 
@@ -27,20 +26,12 @@ public class Classifer_TriTrainning {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String type = "lg";
+	static float ratio = 0.25f;//每次从Unlabeled数据集U中取0.25份作为U’
 	static int increment = 150;//每次取出100个相同的结果
 	static int iter_max = 5;//最多迭代iter_max次
 	static int train_id_size_max = 700;//训练集最大达到该值结束迭代
-	static int fold = 5;
-	static double CHI_threshold = 0.75;//取CHI值排在前50%的特征
-	static String CHI_TYPE = "";//type=""则用chi作为标准，若type="b"则用tf作为筛选标准
-	static boolean CHI_FLAG = false;//是否使用CHI筛选特征
-	static boolean TFIDF_FLAG = false;//是否使用TFIDF表示特征,false时只用tf,true用tfidf
-	static int[] labels = {1,2};
-	static int train_id_size = 400;
-	static String[] classifers = null;
 	static String res_dir = "TriTraining_Line_Description_Tag_Incre150_iter5\\";
-	static StringBuffer log_buff = new StringBuffer();
+	static String[] classifers = null;
 	public static void main(String[] args) throws IOException{
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
@@ -50,21 +41,19 @@ public class Classifer_TriTrainning {
 				"Feature_Relation\\line_vec_all"
 		};
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
-		cross_validation(fold);
+		cross_validation();
 		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt");
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt",log_buff);
 
 	}
-	public static void cross_validation(int fold) throws IOException{
-		double[] res_avg  = new double[3];
-		for(int i=0;i<fold;i++){
+	public static void cross_validation() throws IOException{
+		double acc_avg  = 0.0;
+		for(int i=0;i<Config.FOLD;i++){
 			Config.ResPath = Config.ResPath_Root+res_dir+i;
 			SaveInfo.mkdir(Config.ResPath);
 			SaveInfo.saveResult("-----------------------fold-"+i+"--------------------");
-			log_buff.append("-----------------------fold-"+i+"--------------------\r\n");
-			//获取各classifer-label对应的训练、测试ID集合
-			Map<Integer, ClassNode> label_map = get_train_test_id(i);
-			//迭代训练预测过程，知道训练集数量达到
+			//获取各classifer-label对应的训练、测试ID集合(确定测试集，初始的训练集，初始的假测试集)
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID_TriTraining(i,ratio);
+			//迭代训练预测过程，直到训练集数量达到
 			int train_id_size = 200;int iter = 0;
 			while(train_id_size<train_id_size_max&&iter<iter_max){
 				Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter;
@@ -81,21 +70,20 @@ public class Classifer_TriTrainning {
 				iter++;
 			}
 			//迭代完成后，利用三个分类器的结果进行ensemble处理
-			double[] res = ensemble(i,iter);
-			for(int k=0;k<res.length;k++){
-				res_avg[k] += res[k];
+			String[] classifers_name = new String[classifers.length];
+			for(int j=0;j<classifers.length;j++){
+				classifers_name[j] = classifers[j].split("\\\\")[1].intern();
 			}
+			acc_avg += GetResult.getEssembleResult("", res_dir+i+"\\"+(iter-1)+"\\", res_dir+i+"\\", "",classifers_name);
+			
 		}
-		//对精确度求评价
-		for(int k=0;k<res_avg.length;k++){
-			res_avg[k] = res_avg[k]/fold;
-		}
+		acc_avg = acc_avg/Config.FOLD;
 		SaveInfo.saveResult("-----------------------最终预测结果-------------------");
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir+"\\final_result_"+type+"----accuracy average="+res_avg[0]);
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir+"\\final_result_"+type+"----MicroF1Score average="+res_avg[1]);
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir+"\\final_result_"+type+"----MacroF1Score average="+res_avg[2]);
+		SaveInfo.saveResult(Config.ResPath_Root+res_dir+"\\final_result_"+Config.SVM_TYPE+"----accuracy average="+acc_avg);
 	}
-	private static double[] ensemble(int i,int iter) throws IOException {
+	
+	
+	/*private static double ensemble(int i,int iter) throws IOException {
 		Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+(iter-1)+"\\";
 		Map<String,String> id_actual_res = new TreeMap<String, String>();
 		Map<String,ResultNode> id_predict_res = new TreeMap<String, ResultNode>();
@@ -104,30 +92,14 @@ public class Classifer_TriTrainning {
 			// testing_id.txt testing_data.txt result_lg.txt 同一行为同一个用户
 			List<String> testing_id = ReadInfo.getList(Config.ResPath+"Simple_"+classifer_name,"\\testing_id.txt","\\s",0);
 			GetResult.getActualRes(Config.ResPath+"Simple_"+classifer_name,"\\testing_id.txt",testing_id,id_actual_res,"\\s",1);
-			GetResult.getPredictRes(Config.ResPath+"Simple_"+classifer_name,"\\result_"+type+".txt",testing_id,id_predict_res,1);
+			GetResult.getPredictRes(Config.ResPath+"Simple_"+classifer_name,"\\result_"+Config.SVM_TYPE+".txt",testing_id,id_predict_res,1);
 		}
 		Config.ResPath = Config.ResPath_Root+res_dir+i;
-		SaveInfo.result_writer(Config.ResPath,"\\final_result_"+type+".txt","final_testing_id.txt",id_actual_res,id_predict_res);
+		SaveInfo.result_writer(Config.ResPath,"\\final_result_"+Config.SVM_TYPE+".txt","final_testing_id.txt",id_actual_res,id_predict_res);
 		double accuracy =  GetResult.getAccuracy(id_actual_res,id_predict_res);
-		double microF1 = GetResult.getMicroF1Score(id_actual_res, id_predict_res);
-		double macroF1 = GetResult.getMacroF1Score(id_actual_res, id_predict_res);
-		return new double[]{accuracy,microF1,macroF1};
-	}
-	private static Map<Integer, ClassNode> get_train_test_id(int fold_i) throws IOException {
-		/*Map<String, Map<Integer, ClassNode>> classifer_label_map = new HashMap<String, Map<Integer, ClassNode>>();
-		for(String classifer : classifers){
-			String classifer_name = classifer.split("\\\\")[1].intern();*/
-		Map<Integer, ClassNode> label_map = new HashMap<Integer, ClassNode>();
-		for(int li=1;li<=labels.length;li++){
-			int labelid = labels[li-1];
-			ClassNode classnode = Services.getTTID_TriTraining(fold_i,train_id_size,labelid);
-			label_map.put(labelid, classnode);
-		}
-		return label_map;
-		/*classifer_label_map.put(classifer_name, label_map);
-		}
-		return classifer_label_map;*/
-	}
+		return accuracy;
+	}*/
+
 	/**
 	 * 将classifer_result_map_list中两个分类器结果相同的ID加入到另一个分类器的训练集中
 	 * @param classifer_label_map
@@ -181,7 +153,7 @@ public class Classifer_TriTrainning {
 		return train_id_size;
 	}
 	/**
-	 * 将所有分类器结果相同的ID加入到各自的训练集中
+	 * 将所有分类器结果相同的ID加入到各自的训练集中0
 	 * @param classifer_label_map
 	 * @param classifer_result_map_list
 	 * @return 
@@ -234,37 +206,29 @@ public class Classifer_TriTrainning {
 			String classifer_dir = "Simple_"+classifer_name+"\\".intern();
 			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+d+"\\"+classifer_dir;
 			//得到预测结果       UID:实际lable##预测label##预测置信度
-			Map<String, String> result_map = GetResult.getResult(Config.ResPath,"testing_id_fake","testing_data_fake","result_fake",type);
+			Map<String, String> result_map = GetResult.getResult(Config.ResPath,"testing_id_fake","testing_data_fake","result_fake");
 			classifer_result_map_list.add(result_map);
 		}
 		return classifer_result_map_list;
 	}
 	private static void train_and_predict(int i, int iter, Map<Integer, ClassNode> label_map) throws IOException {
-		for(int k=0;k<classifers.length;k++){
-			String classifer_name = classifers[k].split("\\\\")[1].intern();
-			List<String> classifers_list = new ArrayList<String>();
-			classifers_list.add(classifers[k]);
-			Map<ClassiferNode,Map<String,String>> classifer_user_map = ReadInfo.getMap(classifers_list,"_feature.txt");
-			Services.classifer_user_map = classifer_user_map;
-			String classifer_dir = "Simple_"+classifer_name+"\\".intern();
+		for(String classifer : classifers){
+			String classifer_dir = "Simple_"+classifer.split("\\\\")[1]+"\\".intern();
 			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter+"\\"+classifer_dir;
 			SaveInfo.mkdir(Config.ResPath);
-			if(TFIDF_FLAG){
-				Services.getIDF(i,train_id_size,0,"");
-				Services.getIDF(i,train_id_size,1,"");
-			}
-			for(int li=1;li<=labels.length;li++){
-				int labelid = labels[li-1];
-				SaveInfo.saveResult("------------"+classifer_name+"--label-"+labelid+"-------------");
-				if(CHI_FLAG)Services.getCHI(i,train_id_size,labelid,CHI_threshold,CHI_TYPE,"");
-				ClassNode classnode = label_map.get(labelid);
-				Services.getTTData(li,classnode);
-			}
+			GetUserFeature.classifers.clear();
+			GetUserFeature.classifer_user_map.clear();
+			GetUserFeature.classifers.add(classifer);
+			GetUserFeature.getUserFeatureMap();
+			GetIDF.getIDF(i,0);
+			GetIDF.getIDF(i,1);
+			GetCHI.getCHI(i);
+			GetTrainTestData.getTTData_UserLevel(label_map);
 			//Train and Predict
-			Cmd_Train.train(Config.ResPath,type,"training_data");
-			double accuracy = Cmd_Predict.predict(Config.ResPath,type);//对unlabeled 进行预测
-			log_buff.append(Config.ResPath+"----"+accuracy+"\r\n");
-			Cmd_Predict.predict(Config.ResPath,"testing_data_fake","result_fake",type);//对实际ID进行预测
+			Cmd_Train.train(Config.ResPath,"training_data");
+			double accuracy = Cmd_Predict.predict(Config.ResPath,"testing_data","result");//对unlabeled 进行预测
+			SaveInfo.saveResult(Config.ResPath+"----"+accuracy);
+			Cmd_Predict.predict(Config.ResPath,"testing_data_fake","result_fake");//对实际ID进行预测
 		}
 	}
 }

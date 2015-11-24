@@ -9,10 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.cl.conf.Config;
-import org.cl.model.ClassiferNode;
 import org.cl.utils.ReadInfo;
 import org.cl.utils.SaveInfo;
-import org.cl.utils.Services;
 import org.cl.utils.Utils;
 
 public class Decoder {
@@ -20,11 +18,7 @@ public class Decoder {
 	/**
 	 * 将Config.Public_Info中的<特征编号：chi值>解码成<特征：chi值>，方便数据分析
 	 */
-	static int fold = 1;
-	static int[] labels = {1,2};
-	static int ID_SIZE = 350;
-	static String TYPE = "traintf";
-	static String PUBLIC_INFO_ROOT = "Public_Info_73\\";
+	static String TYPE = "trainidf";
 	static String[] CLASSIFERS = {
 		"Feature_Tag\\Tag",
 		"Feature_UserInfo\\Description",
@@ -35,41 +29,22 @@ public class Decoder {
 		"Feature_Textual\\Text"
 	};
 	public static void main(String args[]) throws IOException{
-		SaveInfo.mkdir(Config.ResPath_Root+PUBLIC_INFO_ROOT+"Decoded\\");
-
-
+		SaveInfo.mkdir(Config.Public_Info+"Decoded\\");
 		String combination = "";
-		if(labels.length<4){
-			for(int labelid : labels){
-				combination+=labelid;
-			}
-			combination+="_";
-		}
-
-		for(int i=0;i<fold;i++){
-			for(int labelid : labels){
+		for(int labelid : Config.LABELS){combination+=labelid;}
+		combination+="_";
+		for(int i=0;i<Config.FOLD;i++){
+			for(int labelid : Config.LABELS){
 				for(String classifer : CLASSIFERS){
 					String classifername = classifer.split("\\\\")[1];
-					Map<String, Double> feature_map = GetFeatureMap(Config.ResPath_Root+PUBLIC_INFO_ROOT+i+"\\",ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt");
-					Map<String,String> feature_dict = GetDict(classifername);
+					Map<String,Double> feature_map = ReadInfo.getMapDouble(Config.Public_Info+i+"\\", Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", ":", 0, 1);
+					Map<String,String> feature_dict = ReadInfo.getMap(Config.SrcPath_Root+"Config\\","Dict_"+classifername+".txt","\t",1,0);
 					List<String> feature_list = DecodeFeatureMap(feature_dict, feature_map);
-					SaveInfo.saveList(Config.ResPath_Root+PUBLIC_INFO_ROOT+"Decoded\\"+i+"\\", ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", feature_list);
+					SaveInfo.saveList(Config.Public_Info+"Decoded\\"+i+"\\",  Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", feature_list);
 				}
 			}
 		}
 	}
-
-	private static Map<String, String> GetDict(String classifername) throws IOException {
-		Map<String,String> feature_dict = ReadInfo.getMap(Config.SrcPath_Root+"Config\\","Dict_"+classifername+".txt","\t",1,0);
-		return feature_dict;
-	}
-
-	private static Map<String, Double> GetFeatureMap(String dir,String filename) throws IOException {
-		// TODO Auto-generated method stub
-		Map<String,Double> feature_map = ReadInfo.getMapDouble(dir, filename, ":", 0, 1);
-		return feature_map;
-	}
-
 
 	private static List<String> DecodeFeatureMap(Map<String,String> dict,Map<String, Double> feature_map) {
 		Map<String, Double> feature_map_new = new HashMap<String,Double>();

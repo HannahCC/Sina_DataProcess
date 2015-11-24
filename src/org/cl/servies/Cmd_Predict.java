@@ -1,4 +1,4 @@
-package org.cl.cmd;
+package org.cl.servies;
 
 
 import java.io.BufferedReader;
@@ -10,14 +10,8 @@ import org.cl.utils.SaveInfo;
 
 public class Cmd_Predict {
 
-	public static double predict(String path,String test_data_file,String result_file,String type) {
-		String cmdStr = getCmdStr(path,test_data_file,result_file,type);
-		double accuracy = execute(path,cmdStr);
-		return accuracy;
-	}
-
-	public static double predict(String path, String type) {
-		String cmdStr = getCmdStr(path,"testing_data","result",type);
+	public static double predict(String path,String test_data_file,String result_file) {
+		String cmdStr = getCmdStr(path,test_data_file,result_file);
 		double accuracy = execute(path,cmdStr);
 		return accuracy;
 	}
@@ -53,10 +47,10 @@ public class Cmd_Predict {
 	}
 
 
-	private static String getCmdStr(String path, String test_data_file,String result_file,
-			String type) {
+	private static String getCmdStr(String path, String test_data_file,String result_file) {
 		String save_path = Config.ResDir+"SVM\\";
 		String cmdStr = "";
+		String type = Config.SVM_TYPE;
 		if(type.equals("lg")){
 			cmdStr = "cmd /k "+save_path+"predict -b 1 "
 					+path+"\\"+test_data_file+".txt "

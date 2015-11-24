@@ -1,4 +1,4 @@
-package org.cl.cmd;
+package org.cl.servies;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -15,10 +15,11 @@ public class Cmd_Train {
 	 * cmd /k start dir 会打开一个新窗口后执行dir指令，原窗口不会关闭。 
 	 * @param group
 	 */
-	public static void train(String path, String type,String train_data_file) {
+	public static void train(String path, String train_data_file) {
 		try {//svm-train .\1\training_data.txt
 			String cmdStr = "";
 			String svm_path = Config.ResDir+"SVM\\";
+			String type = Config.SVM_TYPE;
 			if(type.equals("lg")){
 				cmdStr = "cmd /k "+svm_path+"train -s 0 "+path+train_data_file+".txt";;
 			}else if(type.equals("svm")){
@@ -36,7 +37,7 @@ public class Cmd_Train {
              message =  br.readLine();        
              while(message != null && !"".equals(message)){  
              //将信息输出  
-               //System.out.println(message);  
+               System.out.println(message);  
                message =  br.readLine();  
              }
              //System.out.println(Config.ResPath+"DONE!!!!!!!!!!!!!");

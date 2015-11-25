@@ -43,7 +43,26 @@ public class Utils {
 		id_set_list.add(id_set_2);
 		return id_set_list;
 	}
-	
+	//将id_Set分成两个id_set,第一个number个
+	public static List<Set<String>> spilt(int number, Set<String> id_set) {
+		List<Set<String>> id_set_list = new ArrayList<Set<String>>();
+		Set<String> id_set_1 = new TreeSet<String>();
+		Set<String> id_set_2 = new TreeSet<String>();
+		int i=0;
+		Iterator<String> it = id_set.iterator();
+		while(it.hasNext()){
+			String id = it.next();
+			if(i<number){
+				id_set_1.add(id);
+			}else{
+				id_set_2.add(id);
+			}
+			i++;
+		}
+		id_set_list.add(id_set_1);
+		id_set_list.add(id_set_2);
+		return id_set_list;
+	}
 	public static List<Set<String>> spilt(Set<String> id_set, int fold) {
 		int num = id_set.size();
 		int i_num = num/fold;
@@ -222,7 +241,7 @@ public class Utils {
 		fo.close();
 		out.close();
 	}
-	
+
 	public static void mergeMap(Map<String, Integer> map,Map<String, Integer> new_map) {
 		Iterator<Entry<String, Integer>> it = new_map.entrySet().iterator();
 		while(it.hasNext()){
@@ -327,7 +346,7 @@ public class Utils {
 				else return 0;
 			}
 		});
-		map.clear();
+		//map.clear();
 		for(int i=0;i<list_tmp.size();i++){
 			String uid = list_tmp.get(i).getKey();
 			String res = list_tmp.get(i).getValue();

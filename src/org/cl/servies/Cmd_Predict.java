@@ -12,11 +12,11 @@ public class Cmd_Predict {
 
 	public static double predict(String path,String test_data_file,String result_file) {
 		String cmdStr = getCmdStr(path,test_data_file,result_file);
-		double accuracy = execute(path,cmdStr);
+		double accuracy = execute(path,cmdStr,result_file);
 		return accuracy;
 	}
 
-	private static double execute(String path,String cmdStr) {
+	private static double execute(String path,String cmdStr,String result_file) {
 		try {
 
 			Runtime run = Runtime.getRuntime(); 
@@ -32,10 +32,11 @@ public class Cmd_Predict {
 				//将信息输出  
 				if(message.contains("Accuracy")){
 					accuracy = Double.parseDouble(message.split("(Accuracy = )|(%)")[1]);
-					SaveInfo.saveResult(path+"----"+message);
+					SaveInfo.option_log(path+result_file+"----"+message);
+					SaveInfo.res_log(message.split(" = |%")[1],true);
 				}else if(message.contains("Zero/one-error")){
 					accuracy = 100 - Double.parseDouble(message.split("(: )|(%)")[1]);
-					SaveInfo.saveResult(path+"----"+message);
+					SaveInfo.option_log(path+result_file+"----"+message);
 				}
 				message =  br.readLine();  
 			}

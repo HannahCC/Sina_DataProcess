@@ -28,14 +28,19 @@ public class GetTrainTestID {
 	static int[] TRAIN_ID_SIZE_ARR = Config.TRAIN_ID_SIZE_ARR;//每类用户用于训练的ID数量。
 	static boolean LEARN_FLAG = Config.LEARN_FLAG;//控制是否载入学习数据
 	/*-------------------------从已经分配好的训练、测试ID中得到相应的ID----------------------------------------*/
-	public static Map<Integer, ClassNode> getTTID_TriTraining(int fold_i,float ratio) throws IOException {
+	public static Map<Integer, ClassNode> getTTID_TriTraining(int fold_i,float training_ratio,float learning_ratio) throws IOException {
 		Map<Integer, ClassNode> label_map = new HashMap<Integer, ClassNode>();
 		for(int li=0;li<LABELS.length;li++){
 			int labelid = LABELS[li];
 			Set<String> test_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+labelid+"_testingid.txt");
 			Set<String> id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+TRAIN_ID_SIZE+"_"+labelid+"_trainingid.txt");
-			List<Set<String>> id_set_list = Utils.spilt(id_set, ratio);//将id_set按ratio比例分成两份 ratio:1-ratio
-			ClassNode classnode = new ClassNode(labelid,id_set_list.get(0),test_id_set,id_set_list.get(1));
+			//将id_set按ratio比例分成两份分别作为训练数据和学习数据 training_ratio:1-training_ratio
+			List<Set<String>> id_set_list1 = Utils.spilt(id_set, training_ratio);
+			ClassNode classnode = new ClassNode(labelid,id_set_list1.get(0),test_id_set);
+			//学习数据集中抽取一部分作为初始的学习数据子集
+			List<Set<String>> id_set_list2 = Utils.spilt(id_set_list1.get(1), learning_ratio);
+			classnode.setLearning_id_subset(id_set_list2.get(0));
+			classnode.setLearning_id_set(id_set_list2.get(1));
 			label_map.put(labelid, classnode);
 		}
 		return label_map;
@@ -49,38 +54,13 @@ public class GetTrainTestID {
 			Set<String> test_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+labelid+"_testingid.txt");
 			ClassNode myclassNode = new ClassNode(labelid,train_id_set,test_id_set);
 			if(LEARN_FLAG){
-				Set<String> learn_id_set = ReadInfo.getSet(Config.ResPath_Root,"UserID\\L"+labelid+".txt");
-				myclassNode.setLearning_id_set(learn_id_set);
+				Set<String> learn_id_subset = ReadInfo.getSet(Config.ResPath_Root,"UserID\\L"+labelid+".txt");
+				myclassNode.setLearning_id_subset(learn_id_subset);
 			}
 			label_map.put(labelid, myclassNode);
 		}
 		return label_map;
 	}
-	//获取classnode的训练和测试ID
-	/*public static ClassNode getTTID(int fold_i, int train_id_size, int labelid) throws IOException {
-		Set<String> train_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+train_id_size+"_"+labelid+"_trainingid.txt");
-		Set<String> test_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+labelid+"_testingid.txt");
-		ClassNode myclassNode = new ClassNode(labelid,train_id_set,test_id_set);
-		if(LEARN_FLAG){
-			Set<String> learn_id_set = ReadInfo.getSet(Config.ResPath_Root,"UserID\\L"+labelid+".txt");
-			myclassNode.setLearning_id_set(learn_id_set);
-		}
-		return myclassNode;
-	}*/
-
-	/*public static ClassNode getTTID_TriTraining(int fold_i, int train_id_size, int labelid,float ratio) throws IOException {
-		Set<String> test_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+labelid+"_testingid.txt");
-		Set<String> id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+train_id_size+"_"+labelid+"_trainingid.txt");
-		List<Set<String>> id_set_list = Utils.spilt(id_set, ratio);
-		return new ClassNode(labelid,id_set_list.get(0),test_id_set,id_set_list.get(1));
-	}*/
-
-	/*public static void getTestID_TriTraining(int fold_i, ClassNode classnode) throws IOException {
-		int labelid = classnode.getClassid();
-		Set<String> test_id_set = ReadInfo.getSet(Config.Public_Info,fold_i+"\\"+labelid+"_testingid.txt");
-		classnode.setTesting_id_set(test_id_set);
-	}*/
-
 	/*-------------------------从UserID目录下获取所有ID，将其分配成FOLD组，分别作为训练、测试数据------------------------------*/
 
 	/**

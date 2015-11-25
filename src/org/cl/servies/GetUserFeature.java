@@ -19,13 +19,13 @@ public class GetUserFeature {
 	public static List<String> classifers = new ArrayList<String>();
 
 	static{
-		classifers.add("Feature_UserInfo\\Tag");
+		//classifers.add("Feature_UserInfo\\Tag");
 		////classifers.add("Feature_UserInfo\\Description");
 		//classifers.add("Feature_UserInfo\\Tag_AvgVecIn18w");
 		//classifers.add("Feature_UserInfo\\Description_AvgVecIn18w");
-		//classifers.add("Feature_Relation\\Fri_Fol_Tag");
+		classifers.add("Feature_Relation\\Fri_Fol_Tag");
 		//classifers.add("Feature_Relation\\Fri_Fol_Description");
-		//classifers.add("Feature_Relation\\Line_vec_2nd");
+		//classifers.add("Feature_Relation\\Line_vec_all");
 		//classifers.add("Feature_Relation\\Line6_desc_tag_Conc_18w_vec_all");
 		//classifers.add("Feature_Relation\\FolType");
 		//classifers.add("Feature_Relation\\FriFolType");
@@ -52,7 +52,7 @@ public class GetUserFeature {
 			}
 			int size = getFeatureSize(classifernode.getClassifer_name());
 			classifernode.setClassifer_size(size);
-			SaveInfo.saveResult(classifernode.getClassifer_name()+"SIZE---:"+classifernode.getClassifer_size());
+			SaveInfo.option_log(classifernode.getClassifer_name()+"SIZE---:"+classifernode.getClassifer_size());
 			classifer_user_map.put(classifernode, res);
 			r.close();
 		}

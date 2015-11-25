@@ -3,8 +3,12 @@ package org.cl.main.classifer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.cl.conf.Config;
 import org.cl.model.ClassNode;
 import org.cl.servies.Cmd_Predict;
@@ -26,199 +30,94 @@ public class Classifer_TriTrainning {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static float ratio = 0.25f;//每次从Unlabeled数据集U中取0.25份作为U’
-	static int increment = 150;//每次取出100个相同的结果
-	static int iter_max = 5;//最多迭代iter_max次
-	static int train_id_size_max = 700;//训练集最大达到该值结束迭代
-	static String res_dir = "TriTraining_Line_Description_Tag_Incre150_iter5\\";
+	static float training_ratio = 1/4f;//将原训练数据中training_ratio份作为初始训练数据，其余作为初始学习数据
+	static float learning_ratio = 1/3f;//从学习数据集U中取learning_ratio份作为初始学习数据子集U'
+	static int increment = 10;//不同的更新数据集方法，其意义不一样
+	static int iter_max = 10;//最多迭代iter_max次
+	static boolean STOP_FLAG = false;//迭代次数达到iter_max、unlabeled集中没有数据可用、会置为true
+	static String res_dir = "TriTraining_Line_Tag_Incre10_iter10_update2\\";
 	static String[] classifers = null;
 	public static void main(String[] args) throws IOException{
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		classifers = new String[]{
-				"Feature_Relation\\Fri_Fol_Description",
+				//"Feature_Relation\\Fri_Fol_Description",
 				"Feature_Relation\\Fri_Fol_Tag",
 				"Feature_Relation\\line_vec_all"
 		};
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
 		cross_validation();
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
 
 	}
 	public static void cross_validation() throws IOException{
-		double acc_avg  = 0.0;
+		double[] acc_avg = new double[classifers.length];
+		//double esm_acc_avg  = 0.0;
 		for(int i=0;i<Config.FOLD;i++){
 			Config.ResPath = Config.ResPath_Root+res_dir+i;
 			SaveInfo.mkdir(Config.ResPath);
-			SaveInfo.saveResult("-----------------------fold-"+i+"--------------------");
+			SaveInfo.option_log("-----------------------fold-"+i+"--------------------");
+			SaveInfo.res_log("-----------------------fold-"+i+"--------------------",false);
 			//获取各classifer-label对应的训练、测试ID集合(确定测试集，初始的训练集，初始的假测试集)
-			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID_TriTraining(i,ratio);
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID_TriTraining(i,training_ratio,learning_ratio);
 			//迭代训练预测过程，直到训练集数量达到
-			int train_id_size = 200;int iter = 0;
-			while(train_id_size<train_id_size_max&&iter<iter_max){
+			int iter = 0;
+			STOP_FLAG = false;
+			while(!STOP_FLAG){
 				Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter;
 				SaveInfo.mkdir(Config.ResPath);
-				SaveInfo.saveResult("-----------------------第"+iter+"次迭代-------------------");
+				SaveInfo.option_log("-----------------------第"+iter+"次迭代-------------------");
 				//获取训练、测试数据并进行训练和预测
-				train_and_predict(i,iter,label_map);
+				train_and_predict(i,iter,label_map,true);
 				//获取各分类器的预测结果
-				List<Map<String,String>> classifer_result_map_list = get_predict_result(i,iter);
-				//更新下一轮的训练、测试ID集合(2个分类器结果相同)
-				//update_train_test_id_2(classifer_label_map,classifer_result_map_list);
-				//更新下一轮的训练、测试ID集合(3个分类器结果相同)
-				train_id_size += update_train_test_id(label_map,classifer_result_map_list);
+				Map<String, Map<String,String>> classifer_result_maps = get_predict_result(i,iter);
+				//更新下一轮的训练、测试ID集合
+				//update_train_test_id1(label_map,classifer_result_maps);
+				update_train_test_id2(label_map,classifer_result_maps);
 				iter++;
+				if(iter>=iter_max){
+					STOP_FLAG=true;
+				}
 			}
-			//迭代完成后，利用三个分类器的结果进行ensemble处理
-			String[] classifers_name = new String[classifers.length];
+			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter;
+			SaveInfo.mkdir(Config.ResPath);
+			SaveInfo.option_log("-----------------------第"+iter+"次迭代(最终)-------------------");
+			double[] accuracy = train_and_predict(i,iter,label_map,false);
+			//迭代完后，将最后一次迭代的结果作为最终结果
+			for(int j=0;j<classifers.length;j++){
+				acc_avg[j]+=accuracy[j];
+			}
+			//迭代完成后，利用三个分类器的结果进行ensemble处理,将essemble作为最终结果
+			/*String[] classifers_name = new String[classifers.length];
 			for(int j=0;j<classifers.length;j++){
 				classifers_name[j] = classifers[j].split("\\\\")[1].intern();
 			}
-			acc_avg += GetResult.getEssembleResult("", res_dir+i+"\\"+(iter-1)+"\\", res_dir+i+"\\", "",classifers_name);
-			
+			esm_acc_avg += GetResult.getEssembleResult("", res_dir+i+"\\"+(iter-1)+"\\", res_dir+i+"\\", "",classifers_name);
+			 */
 		}
-		acc_avg = acc_avg/Config.FOLD;
-		SaveInfo.saveResult("-----------------------最终预测结果-------------------");
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir+"\\final_result_"+Config.SVM_TYPE+"----accuracy average="+acc_avg);
-	}
-	
-	
-	/*private static double ensemble(int i,int iter) throws IOException {
-		Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+(iter-1)+"\\";
-		Map<String,String> id_actual_res = new TreeMap<String, String>();
-		Map<String,ResultNode> id_predict_res = new TreeMap<String, ResultNode>();
+
+		SaveInfo.option_log("-----------------------最终预测结果-------------------");
 		for(int j=0;j<classifers.length;j++){
-			String classifer_name = classifers[j].split("\\\\")[1].intern();
-			// testing_id.txt testing_data.txt result_lg.txt 同一行为同一个用户
-			List<String> testing_id = ReadInfo.getList(Config.ResPath+"Simple_"+classifer_name,"\\testing_id.txt","\\s",0);
-			GetResult.getActualRes(Config.ResPath+"Simple_"+classifer_name,"\\testing_id.txt",testing_id,id_actual_res,"\\s",1);
-			GetResult.getPredictRes(Config.ResPath+"Simple_"+classifer_name,"\\result_"+Config.SVM_TYPE+".txt",testing_id,id_predict_res,1);
+			acc_avg[j]=acc_avg[j]/(float)Config.FOLD;
+			SaveInfo.option_log(classifers[j]+"----accuracy average="+acc_avg[j]);
+			SaveInfo.res_log(classifers[j]+"----accuracy average="+acc_avg[j],false);
 		}
-		Config.ResPath = Config.ResPath_Root+res_dir+i;
-		SaveInfo.result_writer(Config.ResPath,"\\final_result_"+Config.SVM_TYPE+".txt","final_testing_id.txt",id_actual_res,id_predict_res);
-		double accuracy =  GetResult.getAccuracy(id_actual_res,id_predict_res);
-		return accuracy;
-	}*/
 
-	/**
-	 * 将classifer_result_map_list中两个分类器结果相同的ID加入到另一个分类器的训练集中
-	 * @param classifer_label_map
-	 * @param classifer_result_map_list
-	 * @return
-	 */
-	private static int update_train_test_id_2(Map<String, Map<Integer, ClassNode>> classifer_label_map, List<Map<String, String>> classifer_result_map_list) {
-		int train_id_size = 0;
+		/*esm_acc_avg = esm_acc_avg/Config.FOLD;
+		SaveInfo.option_log("-----------------------集成最终预测结果-------------------");
+		SaveInfo.option_log(Config.ResPath_Root+res_dir+"\\final_result_"+Config.SVM_TYPE+"----accuracy average="+esm_acc_avg);
+		SaveInfo.res_log(Config.ResPath_Root+res_dir+"\\final_result_"+Config.SVM_TYPE+"----accuracy average="+esm_acc_avg);
+		 */
+	}
+	private static double[] train_and_predict(int i, int iter, Map<Integer, ClassNode> label_map, boolean isPredictLearning) throws IOException {
+		double[] accuracy = new double[classifers.length];
 		for(int j=0;j<classifers.length;j++){
-			//读取令两个分类器中标记相同的ID
-			Map<String, String> result_map1 = classifer_result_map_list.get((j+1)%3);
-			Map<String, String> result_map2 = classifer_result_map_list.get((j+2)%3);
-			Map<String, String> result_map = new HashMap<String, String>();
-			for(String id : result_map1.keySet()){
-				if(result_map2.containsKey(id)){   //UID:实际lable##预测label##预测置信度
-					String[] result1 = result_map1.get(id).split("##");
-					String[] result2 = result_map2.get(id).split("##");
-					if(result1[1].equals(result2[1])){
-						result_map.put(id, result1[0]+"##"+result1[1]+"##"+(Double.parseDouble(result1[2])+Double.parseDouble(result2[2])));
-					}
-				}
-			}
-			//将label相同的ID按照分数排序，选取前increment=100个
-			List<String> increment_id_list = new ArrayList<String>();
-			Utils.mapSortByValue(result_map,increment_id_list);
-
-			//将前increment=100个，从原本的test_id_set中移除，放到train_id_set中
-			String classifer_name = classifers[j].split("\\\\")[1].intern();
-			Map<Integer, ClassNode> label_map = classifer_label_map.get(classifer_name);
-			int num = 0;
-			for(String id_item: increment_id_list){
-				String[] items = id_item.split("##");
-				String uid = items[0];
-				int act_label_id = Integer.parseInt(items[1]);
-				int pre_label_id = Integer.parseInt(items[2]);
-				if(!label_map.get(pre_label_id).getTrainning_id_set().contains(uid)){
-					label_map.get(pre_label_id).getTrainning_id_set().add(uid);
-					label_map.get(act_label_id).getTesting_id_set().remove(uid);
-					num++;
-				}
-				if(act_label_id!=pre_label_id){
-					SaveInfo.saveResult(uid+"----act_label_id="+act_label_id+"---pre_label_id="+pre_label_id);
-				}
-				if(num==increment){
-					break;
-				}
-			}
-			int new_train_id_size = label_map.get(1).getTrainning_id_set().size()+label_map.get(2).getTrainning_id_set().size();
-			train_id_size = train_id_size>new_train_id_size?train_id_size:new_train_id_size;
-		}
-		return train_id_size;
-	}
-	/**
-	 * 将所有分类器结果相同的ID加入到各自的训练集中0
-	 * @param classifer_label_map
-	 * @param classifer_result_map_list
-	 * @return 
-	 * @return
-	 */
-	private static int update_train_test_id(Map<Integer, ClassNode> label_map, List<Map<String, String>> classifer_result_map_list) {
-		Map<String, String> result_map1 = classifer_result_map_list.get(0);
-		Map<String, String> result_map2 = classifer_result_map_list.get(1);
-		Map<String, String> result_map3 = classifer_result_map_list.get(2);
-		Map<String, String> result_map = new HashMap<String, String>();
-		for(String id : result_map1.keySet()){
-			if(result_map2.containsKey(id)&&result_map3.containsKey(id)){// UID:实际lable##预测label##预测置信度
-				String[] result1 = result_map1.get(id).split("##");
-				String[] result2 = result_map2.get(id).split("##");
-				String[] result3 = result_map3.get(id).split("##");
-				if(result1[1].equals(result2[1])&&result1[1].equals(result3[1])){
-					result_map.put(id, result1[0]+"##"+result1[1]+"##"+(Double.parseDouble(result1[2])+Double.parseDouble(result2[2])+Double.parseDouble(result3[2])));
-				}
-			}
-		}
-		//将label相同的ID按照分数排序，选取前increment=100个
-		List<String> increment_id_list = new ArrayList<String>();
-		Utils.mapSortByValue(result_map,increment_id_list);
-
-		//将前increment个，从原本的test_id_set中移除，放到train_id_set中
-		int increment_size = increment<increment_id_list.size()?increment:increment_id_list.size();
-		for(int i=0;i<increment_size;i++){
-			String id_item = increment_id_list.get(i);
-			String[] items = id_item.split("##");
-			String uid = items[0];
-			int act_label_id = Integer.parseInt(items[1]);
-			int pre_label_id = Integer.parseInt(items[2]);
-			if(label_map.get(pre_label_id).getTrainning_id_set().contains(uid)){
-				System.out.println("******************************************"+uid+"********************************");
-			}
-			label_map.get(pre_label_id).getTrainning_id_set().add(uid);
-			label_map.get(act_label_id).getTesting_id_set_fake().remove(uid);
-			if(act_label_id!=pre_label_id){
-				SaveInfo.saveResult(uid+"----act_label_id="+act_label_id+"---pre_label_id="+pre_label_id);
-			}
-		}
-		SaveInfo.saveResult("-------------------------add "+increment_size+ "id------------------------------");
-		return increment_size;
-	}
-
-	private static List<Map<String, String>> get_predict_result(int i,int d) throws IOException {
-		List<Map<String,String>> classifer_result_map_list = new ArrayList<Map<String,String>>();
-		for(String classifer : classifers){
-			String classifer_name = classifer.split("\\\\")[1].intern();
-			String classifer_dir = "Simple_"+classifer_name+"\\".intern();
-			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+d+"\\"+classifer_dir;
-			//得到预测结果       UID:实际lable##预测label##预测置信度
-			Map<String, String> result_map = GetResult.getResult(Config.ResPath,"testing_id_fake","testing_data_fake","result_fake");
-			classifer_result_map_list.add(result_map);
-		}
-		return classifer_result_map_list;
-	}
-	private static void train_and_predict(int i, int iter, Map<Integer, ClassNode> label_map) throws IOException {
-		for(String classifer : classifers){
-			String classifer_dir = "Simple_"+classifer.split("\\\\")[1]+"\\".intern();
+			String classifer_dir = "Simple_"+classifers[j].split("\\\\")[1]+"\\".intern();
 			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+iter+"\\"+classifer_dir;
 			SaveInfo.mkdir(Config.ResPath);
 			GetUserFeature.classifers.clear();
 			GetUserFeature.classifer_user_map.clear();
-			GetUserFeature.classifers.add(classifer);
+			GetUserFeature.classifers.add(classifers[j]);
 			GetUserFeature.getUserFeatureMap();
 			GetIDF.getIDF(i,0);
 			GetIDF.getIDF(i,1);
@@ -226,9 +125,165 @@ public class Classifer_TriTrainning {
 			GetTrainTestData.getTTData_UserLevel(label_map);
 			//Train and Predict
 			Cmd_Train.train(Config.ResPath,"training_data");
-			double accuracy = Cmd_Predict.predict(Config.ResPath,"testing_data","result");//对unlabeled 进行预测
-			SaveInfo.saveResult(Config.ResPath+"----"+accuracy);
-			Cmd_Predict.predict(Config.ResPath,"testing_data_fake","result_fake");//对实际ID进行预测
+			accuracy[j] = Cmd_Predict.predict(Config.ResPath,"testing_data","result");//对实际ID进行预测
+			if(isPredictLearning)Cmd_Predict.predict(Config.ResPath,"learning_data","result_learning");//对unlabeled 进行预测
 		}
+		return accuracy;
+	}
+	private static Map<String, Map<String,String>> get_predict_result(int i,int d) throws IOException {
+		Map<String, Map<String,String>> classifer_result_maps = new HashMap<String, Map<String,String>>();
+		for(String classifer : classifers){
+			String classifer_name = classifer.split("\\\\")[1].intern();
+			String classifer_dir = "Simple_"+classifer_name+"\\".intern();
+			Config.ResPath = Config.ResPath_Root+res_dir+i+"\\"+d+"\\"+classifer_dir;
+			//得到预测结果       UID:实际lable##预测label##预测置信度
+			Map<String, String> result_map = GetResult.getResult(Config.ResPath,"learning_id","learning_data","result_learning");
+			classifer_result_maps.put(classifer_name, result_map);
+		}
+		return classifer_result_maps;
+	}
+	/**
+	 * 将所有分类器结果相同、置信度最高的   最多increment个   ID加入到训练集中,使用预测label,而不是实际lable来作为它在训练集中的label
+	 * @param classifer_label_map
+	 * @param classifer_result_map_list
+	 * @return 
+	 * @return
+	 */
+	static void update_train_test_id1(Map<Integer, ClassNode> label_map, Map<String, Map<String,String>> classifer_result_maps) {
+		Map<String, String> result_map1 = null;
+		Map<String, String> result_map2 = null;
+		Iterator<Entry<String, Map<String, String>>> it = classifer_result_maps.entrySet().iterator();
+		while(it.hasNext()){
+			//读取令两个分类器中标记相同的ID
+			result_map1 = it.next().getValue();
+			while(it.hasNext()){
+				result_map2 = it.next().getValue();
+				Map<String, String> result_map = new HashMap<String, String>();
+				for(String id : result_map1.keySet()){
+					if(result_map2.containsKey(id)){   //UID:实际lable##预测label##预测置信度
+						String[] result1 = result_map1.get(id).split("##");
+						String[] result2 = result_map2.get(id).split("##");
+						if(result1[1].equals(result2[1])){//与此前分类器对该ID的预测结果相同，更新置信度为N个分类器的置信度之和
+							result_map.put(id, result1[0]+"##"+result1[1]+"##"+(Double.parseDouble(result1[2])+Double.parseDouble(result2[2])));
+						}
+					}
+				}
+				result_map1 = result_map;
+			}
+		}
+		//将label相同的ID按照分数排序，选取前increment=100个
+		List<String> increment_id_list = new ArrayList<String>();
+		Utils.mapSortByValue(result_map1,increment_id_list);
+
+		//将前increment个，从原本的learn_id_subset中移除，放到train_id_set中
+		int increment_size = increment<increment_id_list.size()?increment:increment_id_list.size();
+		Map<Integer, Integer> label_increment_size = new HashMap<Integer, Integer>();
+		for(int i=0;i<increment_size;i++){
+			String id_item = increment_id_list.get(i);
+			String[] items = id_item.split("##");
+			String uid = items[0];
+			int act_label_id = Integer.parseInt(items[1]);
+			int pre_label_id = Integer.parseInt(items[2]);
+			Utils.putInMap(label_increment_size, act_label_id, 1);
+			if(label_map.get(pre_label_id).getTrainning_id_set().contains(uid)){
+				System.out.println("**********wrong:test_id-"+uid+"was in train id set********************************");
+			}
+			label_map.get(pre_label_id).getTrainning_id_set().add(uid);
+			label_map.get(act_label_id).getLearning_id_subset().remove(uid);
+			if(act_label_id!=pre_label_id){
+				SaveInfo.option_log(uid+"----act_label_id="+act_label_id+"---pre_label_id="+pre_label_id);
+			}
+		}
+		//从learn_id_set中加入同样个数的case到learn_id_subset中（当learn_id_set中不够数据时，停止迭代）
+		for(Integer label : label_increment_size.keySet()){
+			if(label_map.get(label).getLearning_id_set().size()==0){
+				STOP_FLAG = true;
+				break;
+			}
+			List<Set<String>> id_set_list = Utils.spilt(label_increment_size.get(label), label_map.get(label).getLearning_id_set());
+			label_map.get(label).getLearning_id_subset().addAll(id_set_list.get(0));
+			label_map.get(label).setLearning_id_set(id_set_list.get(1));
+		}
+		SaveInfo.option_log("-------------------------add "+increment_size+ "id------------------------------");
+	}
+	/**
+	 * 从各自分类器中选择置信度最高的case，每个  分类器  每类取前increment个（最多共有classifer.size*label.size*increment个，但分类器之间很多相同的ID）
+	 * 使用预测label,而不是实际lable来作为它在训练集中的label
+	 * 若不同的分类器对同一个用户判断的置信度都较高，但预测类别不一样时，选择相信置信度较高的结果
+	 * @param label_map
+	 * @param classifer_result_maps
+	 * @return
+	 */
+	static void update_train_test_id2(Map<Integer, ClassNode> label_map,Map<String, Map<String, String>> classifer_result_maps) {
+		//将每个分类器的结果按置信度从大到小排序，存放在increment_id_list中
+		//对每个分类器的increment_id_list，各个类别各取出前increment个，存放在最终要被使用的increment_id_map中，并保持对该ID的预测结果为 不同分类器中置信度高的结果
+		Map<String,String> increment_id_map = new HashMap<String,String>();
+		Iterator<Entry<String, Map<String, String>>> it1 = classifer_result_maps.entrySet().iterator();
+		while(it1.hasNext()){
+			Map<String, String> result_map = it1.next().getValue();
+			List<String> increment_id_list = new ArrayList<String>();
+			Utils.mapSortByValue(result_map,increment_id_list);
+			Map<Integer, Integer> pre_label_increment_size = new HashMap<Integer, Integer>();
+			for(String id_res: increment_id_list){
+				String[] items = id_res.split("##");//UID##实际lable##预测label##预测置信度
+				String id = items[0];
+				int pre_label_id = Integer.parseInt(items[2]);
+				float support = Float.parseFloat(items[3]);
+				Utils.putInMap(pre_label_increment_size, pre_label_id, 1);//记录从list中每类分别取了多少个ID
+				//一个ID是否加入increment_id_map对应label的map中，有以下几种情况
+				//1.此前该ID已经存在map中，策略，更新其support为最大值
+				if(increment_id_map.containsKey(id)){//label_increment_id_map对应label的map中已经存在该ID
+					String[] result = increment_id_map.get(id).split("##");//UID##实际lable##预测label##预测置信度
+					if(Integer.parseInt(result[2])!=pre_label_id){//不同的分类器对同一个用户判断的置信度都较高，但预测类别不一样时，选择相信置信度较高的结果	
+						if(Float.parseFloat(result[3])<support){
+							increment_id_map.put(id, id_res);
+						}
+					}
+				}//2.ID还不存在与map中，若该分类器取出的pre_label_id类结果数量还没超过increment，直接加入
+				else if(pre_label_increment_size.get(pre_label_id)<=increment){//每个 分类器  每类最多取前increment个
+					increment_id_map.put(id, id_res);
+				}else{//2.ID还不存在与map中，但该分类器取出的pre_label_id类结果数量已经超过increment，不加入，
+					//判断当前分类器的结果列表是否各类已经取到了increment个,若已经取到，则退出循环
+					int label_size = 0;
+					for(Entry<Integer, Integer> entry: pre_label_increment_size.entrySet()){
+						if(entry.getValue()==increment){
+							label_size++;
+						}
+					}
+					if(label_size==pre_label_increment_size.size()){break;}
+				}
+			}
+		}
+
+		//将前increment个，从原本的learn_id_subset中移除，放到train_id_set中,
+		//再从learn_id_set中加入同样个数的case到learn_id_subset中（当learn_id_set中不够数据时，停止迭代）
+		Map<Integer, Integer> label_increment_size = new HashMap<Integer, Integer>();
+		for(Entry<String, String> id_res_entry : increment_id_map.entrySet()){
+			String res_item = id_res_entry.getValue();
+			String[] items = res_item.split("##");
+			String uid = items[0];
+			int act_label_id = Integer.parseInt(items[1]);
+			int pre_label_id = Integer.parseInt(items[2]);
+			Utils.putInMap(label_increment_size, act_label_id, 1);
+			if(label_map.get(pre_label_id).getTrainning_id_set().contains(uid)){
+				System.out.println("**********wrong:test_id-"+uid+"was in train id set********************************");
+			}
+			label_map.get(pre_label_id).getTrainning_id_set().add(uid);
+			label_map.get(act_label_id).getLearning_id_subset().remove(uid);
+			if(act_label_id!=pre_label_id){
+				SaveInfo.option_log(uid+"----act_label_id="+act_label_id+"---pre_label_id="+pre_label_id);
+			}
+		}
+		//从learn_id_set中加入同样个数的case到learn_id_subset中（当learn_id_set中不够数据时，停止迭代）
+		for(Integer label : label_increment_size.keySet()){
+			if(label_map.get(label).getLearning_id_set().size()==0){
+				STOP_FLAG = true;
+				break;
+			}
+			List<Set<String>> id_set_list = Utils.spilt(label_increment_size.get(label), label_map.get(label).getLearning_id_set());
+			label_map.get(label).getLearning_id_subset().addAll(id_set_list.get(0));
+			label_map.get(label).setLearning_id_set(id_set_list.get(1));
+		}
+		SaveInfo.option_log("-------------------------add "+label_increment_size.size()+ "id------------------------------");
 	}
 }

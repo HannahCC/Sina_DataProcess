@@ -4,9 +4,9 @@ import org.cl.utils.SaveInfo;
 
 public class Config {
 
-	public static final String SrcPath_Root = "D:\\Project_DataMinning\\Data\\Sina_res\\Sina_NLPIR1000_GenderPre\\mute_fake\\";
+	public static final String SrcPath_Root = "D:\\Project_DataMinning\\Data\\Sina_res\\Sina_NLPIRandTHUext1000_Mute_GenderPre\\";
 	public static final String ResDir = "D:\\Project_DataMinning\\DataProcessd\\";
-	public static final String ResPath_Root = ResDir+"Sina_GenderPre_mute_fake1000\\";
+	public static final String ResPath_Root = ResDir+"Sina_GenderPre_mute1000\\";
 	public static String Public_Info = ResPath_Root + "Public_Info_Rel\\";
 	public static String UserID = ResPath_Root + "UserID\\";
 	public static String ResPath = ResPath_Root;

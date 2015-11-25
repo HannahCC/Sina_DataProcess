@@ -9,12 +9,9 @@ public class ClassNode {
 	private int classid = -1;
 	private List<Set<String>>id_set_list = null;
 	private Set<String> trainning_id_set = null;
-	private Set<String> learning_id_set = null;
 	private Set<String> testing_id_set = null;
-	private Set<String> testing_id_set_fake = null;//tri_trainning是假设为test id 的unlabeled id集合
-	/*String test_data = null;
-	String train_data = null;*/
-	//Set<String>id_set = null;
+	private Set<String> learning_id_set = null;//对于tri_trainning，它是unlabeled id集合U
+	private Set<String> learning_id_subset = null;//对于tri_trainning，它是unlabeled id集合的子集U'
 
 	public ClassNode(){}
 	public ClassNode(int classid,List<Set<String>> id_set_list){
@@ -26,18 +23,6 @@ public class ClassNode {
 		this.classid = classid;
 		this.trainning_id_set = trainning_id_set;
 		this.testing_id_set = testing_id_set;
-	}
-	public Set<String> getTesting_id_set_fake() {
-		return testing_id_set_fake;
-	}
-	public void setTesting_id_set_fake(Set<String> testing_id_set_fake) {
-		this.testing_id_set_fake = testing_id_set_fake;
-	}
-	public ClassNode(int classid,Set<String> trainning_id_set,Set<String> testing_id_set,Set<String> testing_id_set_fake) {
-		this.classid = classid;
-		this.trainning_id_set = trainning_id_set;
-		this.testing_id_set = testing_id_set;
-		this.testing_id_set_fake = testing_id_set_fake;
 	}
 	
 	public int getClassid() {
@@ -76,6 +61,12 @@ public class ClassNode {
 	}
 	public void setLearning_id_set(Set<String> learning_id_set) {
 		this.learning_id_set = learning_id_set;
+	}
+	public Set<String> getLearning_id_subset() {
+		return learning_id_subset;
+	}
+	public void setLearning_id_subset(Set<String> learning_id_subset) {
+		this.learning_id_subset = learning_id_subset;
 	}
 	public Set<String> getTesting_id_set() {
 		return testing_id_set;

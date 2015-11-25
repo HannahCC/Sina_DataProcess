@@ -20,7 +20,7 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_Tag\\";
+	static String res_dir = "Simple_Fri_Fol_Tag\\";
 	public static void main(String[] args) throws IOException{
 		/*Config.SrcPath_Root = args[0];
 		Config.ResPath_Root = args[1];
@@ -41,11 +41,11 @@ public class Classifer_UserLevel {
 		/*-----------------------------------1vsall------------------------------------------*/
 		//OnevsAll();
 
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
 	}
 	private static void cross_validation(String dir) throws IOException{
 		for(int i=0;i<Config.FOLD;i++){
-			SaveInfo.saveResult("------------------------fold-"+i+"--------------------");
+			SaveInfo.option_log("------------------------fold-"+i+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+dir+i+"//";
 			SaveInfo.mkdir(Config.ResPath);
 			GetIDF.getIDF(i,0);
@@ -66,7 +66,7 @@ public class Classifer_UserLevel {
 			Config.LABELS[0] = labels_copy[i];
 			for(int j=i+1;j<labels_copy.length;j++){
 				Config.LABELS[1] = labels_copy[j];
-				SaveInfo.saveResult("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
+				SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 				Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 				SaveInfo.mkdir(Config.ResPath);
 				cross_validation(k+"//");
@@ -83,14 +83,14 @@ public class Classifer_UserLevel {
 		Config.LABELS = new int[2];
 		for(float threshold : chi_threshold){
 			GetCHI.CHI_threshold = threshold;
-			SaveInfo.saveResult("------------------------threshold-"+threshold+"--------------------");
+			SaveInfo.option_log("------------------------threshold-"+threshold+"--------------------");
 			SaveInfo.mkdir(Config.ResPath_Root+k);
 			int m = 0;
 			for(int i=0;i<labels_copy.length;i++){
 				Config.LABELS[0] = labels_copy[i];
 				for(int j=i+1;j<labels_copy.length;j++){
 					Config.LABELS[1] = labels_copy[j];
-					SaveInfo.saveResult("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
+					SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 					Config.ResPath = Config.ResPath_Root+res_dir+k+"//"+m+"//";
 					SaveInfo.mkdir(Config.ResPath);
 					cross_validation(k+"//"+m+"//");
@@ -109,7 +109,7 @@ public class Classifer_UserLevel {
 		for(int i=0;i<labels_copy.length;i++){
 			Config.LABELS[0] = labels_copy[i];
 			Config.LABELS[1] = Config.LABELS[0]*10+Config.LABELS[0];
-			SaveInfo.saveResult("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
+			SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
 			cross_validation(k+"//");	
@@ -122,7 +122,7 @@ public class Classifer_UserLevel {
 		int k = 0;
 		for(float threshold : chi_threshold){
 			GetCHI.CHI_threshold = threshold;
-			SaveInfo.saveResult("------------------------threshold-"+threshold+"--------------------");
+			SaveInfo.option_log("------------------------threshold-"+threshold+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
 			cross_validation(k+"\\");
@@ -133,7 +133,7 @@ public class Classifer_UserLevel {
 	public static void allLabel_varTrainSize() throws IOException {
 		int k = 0;
 		for(int size : Config.TRAIN_ID_SIZE_ARR){
-			SaveInfo.saveResult("------------------------train_id_size-"+size+"--------------------");
+			SaveInfo.option_log("------------------------train_id_size-"+size+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
 			cross_validation(k+"\\");

@@ -57,7 +57,7 @@ public class Classifer_Essemble {
 			cross_validation(size);
 		}*/
 
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir,"\\res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"\\res.txt");
 	}
 
 	public static void cross_validation(String dir) throws IOException{
@@ -67,7 +67,8 @@ public class Classifer_Essemble {
 			aver+=accuracy;
 		}
 		aver/=fold;
-		SaveInfo.saveResult("average----"+aver);
+		SaveInfo.option_log("average----"+aver);
+		SaveInfo.res_log("average----"+aver,false);
 	}
 	
 

@@ -55,7 +55,8 @@ public class GetResult {
 		}
 		SaveInfo.result_writer(Config.ResPath_Root+res_dir+dir,"final_result_"+fold_i+"_"+svm_type+".txt","final_testing_id_"+fold_i+".txt",id_actual_res,id_predict_res);
 		double accuracy =  GetResult.getAccuracy(id_actual_res,id_predict_res);
-		SaveInfo.saveResult(Config.ResPath_Root+res_dir+dir+"final_result_"+fold_i+"_"+svm_type+"----"+accuracy);
+		SaveInfo.option_log(Config.ResPath_Root+res_dir+dir+"final_result_"+fold_i+"_"+svm_type+"----"+accuracy);
+		SaveInfo.res_log(Config.ResPath_Root+res_dir+dir+"final_result_"+fold_i+"_"+svm_type+"----"+accuracy,false);
 		return accuracy;
 	}
 	/**

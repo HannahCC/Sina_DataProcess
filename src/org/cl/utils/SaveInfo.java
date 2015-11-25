@@ -17,24 +17,36 @@ import java.util.Set;
 import org.cl.conf.Config;
 import org.cl.model.ResultNode;
 public class SaveInfo {
-	static StringBuffer buff = new StringBuffer();
-	public static void saveResult(int classid, int train_size, int test_size) {
-		String res = classid+"---"+train_size+"---"+test_size;
+	static int flag = 1;
+	static StringBuffer option_log_buff = new StringBuffer();
+	static StringBuffer res_log_buff = new StringBuffer();
+	public static void option_log(String res) {
 		System.out.println(res);
-		buff.append(res+"\r\n");
+		option_log_buff.append(res+"\r\n");
 	}
-	public static void saveResult(String res) {
-		System.out.println(res);
-		buff.append(res+"\r\n");
+	public static void res_log(String res, boolean isFlag) {
+		if(!isFlag){
+			res_log_buff.append("\r\n"+res+"\r\n");
+			flag=1;
+		}else if((flag&4)==0){
+			res_log_buff.append(res+"\t");
+			flag++;
+		}else{
+			res_log_buff.append(res+"\r\n");
+			flag=1;
+		}
 	}
-	public static void saveResult(String res_dir,String res_file) {
+	public static void log_buff_writer(String res_dir,String res_file) {
 		try {
 			File res = new File(res_dir+res_file);
 			BufferedWriter resw = new BufferedWriter(new FileWriter(res,true));
-			resw.write(buff.toString());
+			resw.write(option_log_buff.toString());
+			resw.write("/******************res_log_buff***************************************/\r\n");
+			resw.write(res_log_buff.toString());
 			resw.flush();
 			resw.close();
-			buff = new StringBuffer();
+			option_log_buff = new StringBuffer();
+			res_log_buff = new StringBuffer();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -42,15 +54,14 @@ public class SaveInfo {
 	}
 	public static void data_writer(int labelid, Map<String,StringBuffer> id_feature,int type) {
 		if(id_feature==null||id_feature.size()==0){
-			saveResult("*****************there is no feature!!************************");
+			option_log("*****************there is no feature!!************************");
 			return;
 		}
 		String data_filename = "";String id_filename = "";
 		if(type==0){data_filename = "testing_data.txt";id_filename = "testing_id.txt";}
 		else if(type==1){data_filename = "training_data.txt";id_filename = "training_id.txt";}
-		else if(type==2){data_filename = "testing_data_fake.txt";id_filename = "testing_id_fake.txt";}
-		else if(type==3){data_filename = "learning_data.txt";id_filename = "learning_id.txt";}
-		else{saveResult("*****************data type is wrong!!************************");return;}
+		else if(type==2){data_filename = "learning_data.txt";id_filename = "learning_id.txt";}
+		else{option_log("*****************data type is wrong!!************************");return;}
 		File f1 = new File(Config.ResPath+data_filename);
 		File f2 = new File(Config.ResPath+id_filename);
 		try {

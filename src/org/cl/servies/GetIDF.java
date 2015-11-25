@@ -74,7 +74,7 @@ public class GetIDF {
 			//获取【该分类器】中【每个特征】在文档集中出现的文档数
 			Map<String, Integer> feature_map = new HashMap<String, Integer>();//<特征编号,该特征出现在多少训练用户的微博中>
 			for(String id:id_set){//不同用户
-				if(!user_feature_map.containsKey(id)||user_feature_map.get(id).length()==0){SaveInfo.saveResult(id+"---没有特征----"+classifer);continue;}
+				if(!user_feature_map.containsKey(id)||user_feature_map.get(id).length()==0){SaveInfo.option_log(id+"---没有特征----"+classifer);continue;}
 				List<String> feature_list = Utils.stringFeaturetoList(user_feature_map.get(id));//ReadInfo.getList(Config.SrcPath_Root,classifer.getClassifer_name()+"\\"+id+".txt","\t",0);
 				for(String feature:feature_list){
 					String feature_index = feature.split(":")[0];

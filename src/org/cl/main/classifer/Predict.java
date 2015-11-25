@@ -1,15 +1,10 @@
 package org.cl.main.classifer;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import org.cl.conf.Config;
-import org.cl.model.ResultNode;
 import org.cl.servies.Cmd_Predict;
 import org.cl.servies.Cmd_Train;
-import org.cl.servies.GetResult;
 import org.cl.utils.ReadInfo;
 import org.cl.utils.SaveInfo;
 
@@ -37,7 +32,7 @@ public class Predict {
 		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
 		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
 		};*/
-		String[] classifers = {"Simple_Tag"};
+		String[] classifers = {"Simple_Fri_Fol_Tag"};
 		for(String classifer : classifers){
 		/*Config.ResPath_Root = args[0];
 		type = args[1];
@@ -58,7 +53,7 @@ public class Predict {
 			triblePredict(0,10,0,6,0,5,"testing_data","result");
 			tribleGetF1(0,10,0,6,0,5,"testing_id","result");
 			tribleGetUserNoFeature(0,10,0,6,0,5,"training_data","testing_data");*/
-			SaveInfo.saveResult(Config.ResPath,"res.txt");
+			SaveInfo.log_buff_writer(Config.ResPath,"res.txt");
 		}
 	}
 	public static void singleTrain(String dir, int s, int n,String train_data_file) {
@@ -76,7 +71,8 @@ public class Predict {
 		}
 		if(isAverage){
 			average /= n;
-			SaveInfo.saveResult(Config.SVM_TYPE+" accuracy average="+average);
+			SaveInfo.option_log(Config.SVM_TYPE+" accuracy average="+average);
+			SaveInfo.res_log(Config.SVM_TYPE+" accuracy average="+average,false);
 		}
 	}
 	/*public static void singleGetF1(String dir, int s, int n,String test_id_file,String result_file) throws IOException {
@@ -112,7 +108,7 @@ public class Predict {
 			sum+= num;
 		}
 		double avg = sum/(double)5;
-		SaveInfo.saveResult("User has no feature average="+avg);
+		SaveInfo.option_log("User has no feature average="+avg);
 	}
 
 	public static void doubleTrain(String dir, int s1, int n1, int s2, int n2,String train_data_file){

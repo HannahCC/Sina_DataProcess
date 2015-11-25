@@ -37,7 +37,7 @@ public class Cmd_Train {
              message =  br.readLine();        
              while(message != null && !"".equals(message)){  
              //将信息输出  
-               System.out.println(message);  
+               //System.out.println(message);  
                message =  br.readLine();  
              }
              //System.out.println(Config.ResPath+"DONE!!!!!!!!!!!!!");

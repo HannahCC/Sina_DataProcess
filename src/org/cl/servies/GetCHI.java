@@ -100,7 +100,7 @@ public class GetCHI {
 				Entry<ClassiferNode, Map<String, String>> classifer = it.next();
 				Map<String, String> user_feature_map = classifer.getValue();
 				for(String id : train_id_set){
-					if(!user_feature_map.containsKey(id)||user_feature_map.get(id).length()==0){SaveInfo.saveResult(id+"---没有特征----"+classifer.getKey());continue;}
+					if(!user_feature_map.containsKey(id)||user_feature_map.get(id).length()==0){SaveInfo.option_log(id+"---没有特征----"+classifer.getKey());continue;}
 					List<String> feature_list = Utils.stringFeaturetoList(user_feature_map.get(id));
 					for(String feature:feature_list){
 						String feature_index = feature.split(":")[0];

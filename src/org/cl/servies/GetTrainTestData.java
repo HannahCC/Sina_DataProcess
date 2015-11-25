@@ -40,17 +40,12 @@ public class GetTrainTestData {
 		for(int li=1;li<=LABELS.length;li++){
 			int labelid = LABELS[li-1];
 			ClassNode classnode = label_map.get(labelid);
-			SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-			SaveInfo.saveResult("------------------------Getting Testing Data--------------------");
+			SaveInfo.option_log("--------------label-"+labelid+"-------------");
+			SaveInfo.option_log("------------------------Getting Testing Data--------------------");
 			getData_UserLevel(labelid,classnode.getTesting_id_set(),0);//获取测试数据
-			getData_UserLevel(labelid,classnode.getTesting_id_set_fake(),2);//获取测试Fake数据
-			SaveInfo.saveResult("------------------------Getting Trainning Data--------------------");
+			getData_UserLevel(labelid,classnode.getLearning_id_subset(),2);//获取学习数据（假的测试数据）
+			SaveInfo.option_log("------------------------Getting Trainning Data--------------------");
 			getData_UserLevel(labelid,classnode.getTrainning_id_set(),1);//获取训练数据
-			Set<String> learning_id = classnode.getLearning_id_set();
-			if(learning_id!=null&&learning_id.size()>0){
-				SaveInfo.saveResult("------------------------Getting Learning Data--------------------");
-				getData_UserLevel(labelid,classnode.getLearning_id_set(),3);//获取学习数据
-			}
 		}
 	}
 
@@ -58,16 +53,11 @@ public class GetTrainTestData {
 		for(int li=1;li<=LABELS.length;li++){
 			int labelid = LABELS[li-1];
 			ClassNode classnode = label_map.get(labelid);
-			SaveInfo.saveResult("--------------label-"+labelid+"-------------");
-			SaveInfo.saveResult("------------------------Getting Testing Data--------------------");
+			SaveInfo.option_log("--------------label-"+labelid+"-------------");
+			SaveInfo.option_log("------------------------Getting Testing Data--------------------");
 			getData_WeiboLevel(labelid,classnode.getTesting_id_set(),0);//获取测试数据
-			SaveInfo.saveResult("------------------------Getting Trainning Data--------------------");
+			SaveInfo.option_log("------------------------Getting Trainning Data--------------------");
 			getData_WeiboLevel(labelid,classnode.getTrainning_id_set(),1);//获取训练数据
-			Set<String> learning_id = classnode.getLearning_id_set();
-			if(learning_id!=null&&learning_id.size()>0){
-				SaveInfo.saveResult("------------------------Getting Learning Data--------------------");
-				getData_WeiboLevel(labelid,classnode.getLearning_id_set(),1);//获取学习数据
-			}
 		}
 	}
 
@@ -83,7 +73,7 @@ public class GetTrainTestData {
 			Map<String, String> feature_map = classifer_entry.getValue();
 			String classifer_name = classifer.getClassifer_name();
 			for(String id : id_set){
-				if(!feature_map.containsKey(id)||feature_map.get(id).length()==0){SaveInfo.saveResult(id+"---没有特征----"+classifer_name);continue;}
+				if(!feature_map.containsKey(id)||feature_map.get(id).length()==0){SaveInfo.option_log(id+"---没有特征----"+classifer_name);continue;}
 				List<String> feature_list = Utils.stringFeaturetoList(feature_map.get(id));
 				//进行特征选择，当未获取该Classifer的各特征的CHI时不会进行特征选择
 				//训练用户才能使用CHI进行筛选，对测试用户若使用CHI，即隐式的使用了训练用户的信息。因为每次筛选时是根据测试用户类别选择所用的CHI列表，即我们提前知道了测试用户的类别。

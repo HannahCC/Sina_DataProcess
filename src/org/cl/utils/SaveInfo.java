@@ -41,8 +41,10 @@ public class SaveInfo {
 			File res = new File(res_dir+res_file);
 			BufferedWriter resw = new BufferedWriter(new FileWriter(res,true));
 			resw.write(option_log_buff.toString());
-			resw.write("/******************res_log_buff***************************************/\r\n");
-			resw.write(res_log_buff.toString());
+			if(res_log_buff.length()>0){
+				resw.write("/******************res_log_buff***************************************/\r\n");
+				resw.write(res_log_buff.toString());
+			}
 			resw.flush();
 			resw.close();
 			option_log_buff = new StringBuffer();
@@ -82,7 +84,7 @@ public class SaveInfo {
 	}
 
 	public static void id_writer(String filename, Set<String> id_set) {
-		File f = new File(Config.ResPath_Root+filename);
+		File f = new File(filename);
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 			for(String id : id_set){

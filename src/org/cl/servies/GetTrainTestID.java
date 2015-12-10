@@ -83,6 +83,25 @@ public class GetTrainTestID {
 				//获取固定的size的数据作为训练数据
 				classnode.setTrainning_id_set(i);
 				SaveInfo.id_writer(Config.Public_Info+i+"\\"+TRAIN_ID_SIZE+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
+			}
+		}
+	}
+	/**
+	 * 从USERID_ROOT目录下获取labelid类用户ID，分成FOLD组，得到FOLD组测试用户ID和训练用户ID。每组测试用户和训练用户不会产生交叉
+	 * 每组训练用户可以获取不同规模，规模大小存储在TRAIN_ID_SIZE数组中。 （规模最大为ID_NUMBER/FOLD）(取较小规模的ID时，顺序抽取前size个)
+	 * 测试用户ID命名规则：[labelid]_testingid.txt   
+	 * 训练用户ID命名规则：[size]_[labelid]_trainingid.txt
+	 * @param labelid
+	 * @throws IOException 
+	 */
+	public static void setTrain_TestID_diffSize_byFOLD() throws IOException {
+		for(int labelid : LABELS){
+			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
+			ClassNode classnode = new ClassNode(labelid,id_set_list);
+			for(int i=0;i<FOLD;i++){  //每折使用其中1组作为测试，另外FOLD-1组作为训练
+				SaveInfo.mkdir(Config.Public_Info+i);
+				classnode.setTesting_id_set(i);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\"+labelid+"_testingid"+".txt",classnode.getTesting_id_set());
 
 				//针对训练数据变化的实验，训练数据分别由1份、2份、3...FOLD-1份数据组成
 				int id_size = id_set_list.get(0).size();
@@ -90,6 +109,25 @@ public class GetTrainTestID {
 					classnode.setTrainning_id_set_byfold(i, n);
 					SaveInfo.id_writer(Config.Public_Info+i+"\\"+(n*id_size)+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
 				}
+			}
+		}
+	}
+	/**
+	 * 从USERID_ROOT目录下获取labelid类用户ID，分成FOLD组，得到FOLD组测试用户ID和训练用户ID。每组测试用户和训练用户不会产生交叉
+	 * 每组训练用户可以获取不同规模，规模大小存储在TRAIN_ID_SIZE数组中。 （规模最大为ID_NUMBER/FOLD）(取较小规模的ID时，顺序抽取前size个)
+	 * 测试用户ID命名规则：[labelid]_testingid.txt   
+	 * 训练用户ID命名规则：[size]_[labelid]_trainingid.txt
+	 * @param labelid
+	 * @throws IOException 
+	 */
+	public static void setTrain_TestID_diffSize_bySIZE() throws IOException {
+		for(int labelid : LABELS){
+			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
+			ClassNode classnode = new ClassNode(labelid,id_set_list);
+			for(int i=0;i<FOLD;i++){  //每折使用其中1组作为测试，另外FOLD-1组作为训练
+				SaveInfo.mkdir(Config.Public_Info+i);
+				classnode.setTesting_id_set(i);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\"+labelid+"_testingid"+".txt",classnode.getTesting_id_set());
 
 				//针对训练数据变化的实验，训练数据从id_set_list选第i组以外的组中各抽取部分，凑齐size个作为训练ID
 				for(int size : TRAIN_ID_SIZE_ARR){  

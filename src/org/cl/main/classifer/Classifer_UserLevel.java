@@ -20,7 +20,7 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_Fri_Fol_Tag\\";
+	static String res_dir = "Simple_SrcType1\\";
 	public static void main(String[] args) throws IOException{
 		/*Config.SrcPath_Root = args[0];
 		Config.ResPath_Root = args[1];

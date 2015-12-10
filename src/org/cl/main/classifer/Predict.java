@@ -32,7 +32,7 @@ public class Predict {
 		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
 		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
 		};*/
-		String[] classifers = {"Simple_Fri_Fol_Tag"};
+		String[] classifers = {"Simple_SrcType1"};
 		for(String classifer : classifers){
 		/*Config.ResPath_Root = args[0];
 		type = args[1];

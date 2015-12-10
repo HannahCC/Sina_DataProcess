@@ -35,7 +35,7 @@ public class Classifer_TriTrainning {
 	static int increment = 10;//不同的更新数据集方法，其意义不一样
 	static int iter_max = 10;//最多迭代iter_max次
 	static boolean STOP_FLAG = false;//迭代次数达到iter_max、unlabeled集中没有数据可用、会置为true
-	static String res_dir = "TriTraining_Line_Tag_Incre10_iter10_update2\\";
+	static String res_dir = "TriTraining_Line_Tag_Incre10_iter10_update1\\";
 	static String[] classifers = null;
 	public static void main(String[] args) throws IOException{
 		Config.ResPath = Config.ResPath_Root+res_dir;
@@ -72,8 +72,8 @@ public class Classifer_TriTrainning {
 				//获取各分类器的预测结果
 				Map<String, Map<String,String>> classifer_result_maps = get_predict_result(i,iter);
 				//更新下一轮的训练、测试ID集合
-				//update_train_test_id1(label_map,classifer_result_maps);
-				update_train_test_id2(label_map,classifer_result_maps);
+				update_train_test_id1(label_map,classifer_result_maps);
+				//update_train_test_id2(label_map,classifer_result_maps);
 				iter++;
 				if(iter>=iter_max){
 					STOP_FLAG=true;

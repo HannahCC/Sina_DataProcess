@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,22 +15,8 @@ import org.cl.utils.SaveInfo;
 public class GetUserFeature {
 
 	public static Map<ClassiferNode,Map<String,String>> classifer_user_map = new HashMap<ClassiferNode,Map<String, String>>();
-	public static List<String> classifers = new ArrayList<String>();
+	public static List<String> classifers = Config.CLASSIFERS;
 
-	static{
-		//classifers.add("Feature_UserInfo\\Tag");
-		////classifers.add("Feature_UserInfo\\Description");
-		//classifers.add("Feature_UserInfo\\Tag_AvgVecIn18w");
-		//classifers.add("Feature_UserInfo\\Description_AvgVecIn18w");
-		classifers.add("Feature_Relation\\Fri_Fol_Tag");
-		//classifers.add("Feature_Relation\\Fri_Fol_Description");
-		//classifers.add("Feature_Relation\\Line_vec_all");
-		//classifers.add("Feature_Relation\\Line6_desc_tag_Conc_18w_vec_all");
-		//classifers.add("Feature_Relation\\FolType");
-		//classifers.add("Feature_Relation\\FriFolType");
-		//classifers.add("Feature_SRC\\AppType");
-	}
-	
 	
 	public static void getUserFeatureMap() throws IOException {
 		for(String classifer : classifers){

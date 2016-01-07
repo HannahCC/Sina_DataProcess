@@ -17,12 +17,12 @@ import org.cl.utils.SaveInfo;
 import org.cl.utils.Utils;
 
 public class GetIDF {
-	public static Map<String,Map<String, Double>> train_IDF = null;
-	public static Map<String,Map<String, Double>> test_IDF = null;
-	static boolean TFIDF_FLAG = Config.TFIDF_FLAG;//是否使用TFIDF表示特征,false时只用tf,true用tfidf
-	static int[] LABELS = Config.LABELS;
-	static int TRAIN_ID_SIZE = Config.TRAIN_ID_SIZE;//每类用户用于训练的ID数量。
-	static String COMBINATION = Config.COMBINATION;
+	public static final Map<String,Map<String, Double>> train_IDF = new HashMap<String,Map<String, Double>>();
+	public static final Map<String,Map<String, Double>> test_IDF = new HashMap<String,Map<String, Double>>();
+	static final boolean TFIDF_FLAG = Config.TFIDF_FLAG;//是否使用TFIDF表示特征,false时只用tf,true用tfidf
+	static final int[] LABELS = Config.LABELS;
+	static final int TRAIN_ID_SIZE = Config.TRAIN_ID_SIZE;//每类用户用于训练的ID数量。
+	static final String COMBINATION = Config.COMBINATION;
 	static Map<ClassiferNode,Map<String,String>> classifer_user_map = null;
 	static{
 		classifer_user_map = GetUserFeature.classifer_user_map;
@@ -32,12 +32,12 @@ public class GetIDF {
 	}
 	//获取各类别中各特征的idf值 ,type为1是文档集为训练用户文档集，type为0是文档集为测试用户文档集
 	public static void getIDF(int fold_i, int type) throws IOException{
-		if(false==TFIDF_FLAG||null!=train_IDF||null!=test_IDF)return;
+		if(false==TFIDF_FLAG)return;
 		Map<String, Map<String, Double>> IDF  = null;
 		String typename = null;
 		if(type==0){IDF = test_IDF;typename = "test";}
 		else if(type==1){IDF = train_IDF;typename = "train";}
-		IDF = new HashMap<String,Map<String, Double>>();
+		IDF.clear();
 		if(classifer_user_map==null||classifer_user_map.size()==0)return;
 		Iterator<ClassiferNode> it = classifer_user_map.keySet().iterator();
 		while(it.hasNext()){
@@ -92,7 +92,7 @@ public class GetIDF {
 				feature_idf_map.put(index, idf);
 			}
 			List<String> feature_idf_list = new ArrayList<String>();
-			Utils.mapSortByValue(feature_idf_list, feature_idf_map);
+			Utils.mapSortByValueDouble(feature_idf_list, feature_idf_map);
 			SaveInfo.saveList(Config.Public_Info,fold_i+"\\"+train_id_size+"_"+COMBINATION+classifer.getClassifer_name()+"_"+typename+"idf.txt", feature_idf_list);
 		}
 	}

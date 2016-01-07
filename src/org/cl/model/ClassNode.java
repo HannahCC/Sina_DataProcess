@@ -41,7 +41,7 @@ public class ClassNode {
 	public void setTrainning_id_set(int i) {
 		this.trainning_id_set = new TreeSet<String>();
 		for(int j=0;j<id_set_list.size();j++){
-			if(j!=i){merge(trainning_id_set,id_set_list.get(j));}
+				if(j!=i){merge(trainning_id_set,id_set_list.get(j));}
 		}
 	}
 	//从id_set_list选第i组以外 选num组作为训练ID
@@ -61,6 +61,17 @@ public class ClassNode {
 	}
 	public void setLearning_id_set(Set<String> learning_id_set) {
 		this.learning_id_set = learning_id_set;
+	}
+	public void setLearning_id_set(int ... ii) {
+		this.learning_id_set = new TreeSet<String>();
+		for(int j=0;j<id_set_list.size();j++){
+			boolean flag = true;
+			for(int i:ii){
+				if(j==i){flag = false;break;}
+			}
+			if(flag){merge(learning_id_set,id_set_list.get(j));}
+		}
+		
 	}
 	public Set<String> getLearning_id_subset() {
 		return learning_id_subset;

@@ -32,13 +32,11 @@ public class Predict {
 		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
 		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
 		};*/
-		String[] classifers = {"Simple_SrcType1"};
+		String[] classifers = {"Simple_Src_频次_tfidf"};
 		for(String classifer : classifers){
-		/*Config.ResPath_Root = args[0];
-		type = args[1];
-		for(int i=2;i<args.length;i++){
+
+		/*for(int i=0;i<args.length;i++){
 			String classifer = args[i];*/
-			
 			Config.ResPath = Config.ResPath_Root + classifer +"\\"; 
 			singleTrain("",0,5,"training_data");//"training_data");
 			singlePredict("",0,5,"testing_data","result");

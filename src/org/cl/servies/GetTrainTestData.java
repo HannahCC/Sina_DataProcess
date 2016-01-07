@@ -23,11 +23,13 @@ public class GetTrainTestData {
 	static int[] LABELS = Config.LABELS;
 	static int WEIBO_NUMBER = Config.WEIBO_NUMBER;//微博级别的分类器，控制微博数量
 	static Map<Integer,Map<String,Map<String, Double>>> CHI = null;
+	static Map<Integer,Map<String,Map<String, Double>>> DF = null;
 	static Map<String,Map<String, Double>> train_IDF = null;
 	static Map<String,Map<String, Double>> test_IDF = null;
 	static Map<ClassiferNode,Map<String,String>> classifer_user_map = null;
 	static{
 		CHI = GetCHI.CHI;
+		DF = GetDF.DF;
 		train_IDF = GetIDF.train_IDF;
 		test_IDF = GetIDF.test_IDF;
 		classifer_user_map = GetUserFeature.classifer_user_map;
@@ -81,6 +83,12 @@ public class GetTrainTestData {
 					Map<String, Double> CHI_map = CHI.get(labelid).get(classifer_name);
 					getSelectedFeatureByCHI(CHI_map, feature_list);
 				}
+				//训练用户才能使用DF进行筛选，对测试用户若使用DF，即隐式的使用了训练用户的信息。因为每次筛选时是根据测试用户类别选择所用的DF列表，即我们提前知道了测试用户的类别。
+				if(Config.DF_FLAG==true&&data_type==1&&DF!=null&&DF.containsKey(labelid)&&DF.get(labelid).containsKey(classifer_name)){
+					Map<String, Double> DF_map = DF.get(labelid).get(classifer_name);
+					getSelectedFeatureByCHI(DF_map, feature_list);
+				}
+				if(feature_list.size()==0){SaveInfo.option_log(id+"---特征选择后已没有特征----"+classifer_name);continue;}
 				//将各特征表示成tfidf值
 				//getFrequency(feature_list);//将对应特征的值由原来的频次改为频率
 				if(data_type==1){getTFIDF(classifer_name,feature_list,train_IDF);}
@@ -123,6 +131,9 @@ public class GetTrainTestData {
 		for(String feature:feature_list){
 			String index = feature.split(":")[0];
 			if(CHI_map.containsKey(index)){new_feature_list.add(feature);}
+			/*else{
+				System.out.println(feature);
+			}*/
 		}
 		feature_list.clear();
 		feature_list.addAll(new_feature_list);

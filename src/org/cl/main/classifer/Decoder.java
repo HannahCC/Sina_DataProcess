@@ -56,7 +56,7 @@ public class Decoder {
 			feature_map_new.put(decode, entry.getValue());
 		}
 		List<String> feature_list = new ArrayList<String>();
-		Utils.mapSortByValue(feature_list, feature_map_new);
+		Utils.mapSortByValueDouble(feature_list, feature_map_new);
 		return feature_list;
 	}
 }

@@ -17,7 +17,7 @@ public class Classifer_Essemble {
 	static String svm_type = Config.SVM_TYPE;
 	static double[] weights = {1,1,1,1,1,1,1,1,1,1,1};//new double[10];
 	static String res_dir;
-	static String[] classfiers = {"Description","Fri_Fol_Description"};
+	static String[] classfiers = {"TagVecCon","AppTopic_train_2000_100_nvabg_AVG·100","LFDMMVFriTopic_train_2000_100_100_0.6"};
 	//static String[] classfiers = {"Fri_Tag","Fol_Tag","Fri_Description","Fol_Description"};
 	
 	/*static String[] classfiers = {"vecAll_line","Tag_AvgVecIn18w","Tag","Fri_Tag","Fol_Tag",

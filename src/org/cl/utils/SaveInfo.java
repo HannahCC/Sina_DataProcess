@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -278,6 +279,20 @@ public class SaveInfo {
 			e.printStackTrace();
 		}
 
+	}
+	public static void saveArrays(String filename, double[][] res) {
+		File f = new File(filename);
+		try {
+			BufferedWriter w = new BufferedWriter(new FileWriter(f));
+			for(double[] r : res){
+				w.write(Arrays.toString(r)+"\r\n");
+			}
+			w.flush();
+			w.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

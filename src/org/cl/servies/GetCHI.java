@@ -16,7 +16,7 @@ import org.cl.utils.SaveInfo;
 import org.cl.utils.Utils;
 
 public class GetCHI {
-	public static Map<Integer,Map<String,Map<String, Double>>> CHI = null;//{LABEL:{CLASSFILENAME:{FETURE:CHI}}}
+	public final static Map<Integer,Map<String,Map<String, Double>>> CHI = new HashMap<Integer, Map<String,Map<String,Double>>>();//{LABEL:{CLASSFILENAME:{FETURE:CHI}}}
 	public static float CHI_threshold = Config.CHI_threshold;
 	static boolean CHI_FLAG = Config.CHI_FLAG;//是否使用CHI筛选特征
 	static int[] LABELS = Config.LABELS;
@@ -32,8 +32,8 @@ public class GetCHI {
 	/*-------------------------获取已经计算好的CHI（每种train_id_size、每类label，特征的chi值都不相同）----------------------------------------*/
 
 	public static void getCHI(int fold_i) throws IOException{
-		if(false==CHI_FLAG||null!=CHI)return;
-		CHI = new HashMap<Integer, Map<String,Map<String,Double>>>();
+		if(false==CHI_FLAG)return;
+		CHI.clear();
 		for(int li=1;li<=LABELS.length;li++){
 			int labelid = LABELS[li-1];
 			Map<String,Map<String, Double>> I_CHI = new HashMap<String,Map<String, Double>>();
@@ -74,9 +74,8 @@ public class GetCHI {
 				Map<String, Integer> nega_feature_map = getNega_FeatureMap(labelid,classifer_name,lable_map);//得到非当前类别用户文档中，各特征出现次数
 				Map<String, Double> feature_chi_map = new HashMap<String, Double>();
 				NormalizeCHI(train_id_size,post_feature_map,nega_feature_map,feature_chi_map);
-				//NormalizeCHIOfNega(train_id_size,nega_feature_map,feature_chi_map);
 				List<String> feature_chi_list = new ArrayList<String>();
-				Utils.mapSortByValue(feature_chi_list,feature_chi_map,post_feature_map);
+				Utils.mapSortByValueDouble(feature_chi_list,feature_chi_map,post_feature_map);
 				SaveInfo.saveList(Config.Public_Info, fold_i+"\\"+train_id_size+"_"+COMBINATION+labelid+"_"+classifer_name+"chi.txt", feature_chi_list,feature_chi_list.size());
 			}
 		}
@@ -157,48 +156,15 @@ public class GetCHI {
 			if(nega_feature_map.containsKey(index)){B = nega_feature_map.get(index);}
 			double D = N-train_id_size-B;
 			if(A+C==0||B+D==0||A+B==0||C+D==0){
-				feature_chi_map.put(index,0.0);}
-			else{
+				feature_chi_map.put(index,0.0);
+			}else{
 				double TMP = A*D - C*B;
 				double chi =(N/(A+C))*(TMP/(B+D))*(TMP/(A+B))*(1/(C+D));
 				if(chi<0){
 					System.out.println(chi+"error!!!!!!!!!!!");
 				}
+				feature_chi_map.put(index,chi);
 			}
 		}
 	}
-	/**
-	 * 补充计算正类用户的特征列表中未曾出现、但出现在负类用户的特征列表里的特征  的CHI值(以前CHI用于对测试数据筛选，然而这是不对的。。。)
-	 * A =使用t表情的c类用户数（0）
-	 * B =使用t表情的非c类用户数
-	 * C =不使用t表情的c类用户数（train_id_size）
-	 * D =不使用t表情的非c类用户数
-	 */
-	/*private static void NormalizeCHIOfNega(int train_id_size,
-			Map<String, Integer> nega_feature_map,
-			Map<String, Double> feature_chi_map) {
-		double N = train_id_size*LABELS.length;
-		Iterator<Entry<String, Integer>> nega_it = nega_feature_map.entrySet().iterator();
-		while(nega_it.hasNext()){
-			Entry<String, Integer> entry = nega_it.next();
-			String index = entry.getKey();
-			if(feature_chi_map.containsKey(index))continue;//如果已经存在，说明正类中存在该特征，已经计算过其chi值
-			int count = entry.getValue();
-			double A = 0;
-			double C = train_id_size;
-			double B = count;
-			double D = N-train_id_size-B;
-			if(A+C==0||B+D==0||A+B==0||C+D==0){
-				feature_chi_map.put(index,0.0);}
-			else{
-				double TMP = A*D - C*B;
-				double chi =(N/(A+C))*(TMP/(B+D))*(TMP/(A+B))*(1/(C+D));
-				if(chi<0){
-					System.out.println(chi+"error!!!!!!!!!!!");
-				}
-				feature_chi_map.put(index, chi);
-			}
-		}
-	}*/
-
 }

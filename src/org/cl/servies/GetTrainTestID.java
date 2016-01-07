@@ -25,6 +25,7 @@ public class GetTrainTestID {
 	static int[] LABELS = Config.LABELS;//类别
 	static int ID_NUMBER = Config.ID_NUMBER;//每类ID数量
 	static int TRAIN_ID_SIZE = Config.TRAIN_ID_SIZE;//每类用户用于训练的ID数量。
+	static int LEARN_ID_SIZE = Config.LEARN_ID_SIZE;//每类用户用于训练的ID数量。
 	static int[] TRAIN_ID_SIZE_ARR = Config.TRAIN_ID_SIZE_ARR;//每类用户用于训练的ID数量。
 	static boolean LEARN_FLAG = Config.LEARN_FLAG;//控制是否载入学习数据
 	/*-------------------------从已经分配好的训练、测试ID中得到相应的ID----------------------------------------*/
@@ -161,7 +162,32 @@ public class GetTrainTestID {
 			}
 		}
 	}
-
+	/**
+	 * 从USERID_ROOT目录下获取labelid类用户ID，分成FOLD组，得到FOLD组测试用户ID和学习用户ID和训练用户ID。每组测试用户和训练用户不会产生交叉
+	 * 每组训练用户可以获取不同规模，规模大小存储在TRAIN_ID_SIZE数组中。 （规模最大为ID_NUMBER/FOLD）(取较小规模的ID时，顺序抽取前size个)
+	 * 测试用户ID命名规则：[labelid]_testingid.txt   
+	 * 训练用户ID命名规则：[size]_[labelid]_trainingid.txt
+	 * @param labelid
+	 * @throws IOException 
+	 */
+	public static void setTrain_Test_LearnID() throws IOException {
+		for(int labelid : LABELS){
+			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
+			ClassNode classnode = new ClassNode(labelid,id_set_list);
+			for(int i=0;i<FOLD;i++){  //每折使用其中1组作为测试，另外FOLD-1组作为训练
+				int testing = i;
+				int training = (i+1)%FOLD;
+				SaveInfo.mkdir(Config.Public_Info+i);
+				classnode.setTesting_id_set(testing);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\"+labelid+"_testingid"+".txt",classnode.getTesting_id_set());
+				//获取固定的size的数据作为训练数据
+				classnode.setTrainning_id_set(id_set_list.get(training));
+				SaveInfo.id_writer(Config.Public_Info+i+"\\"+TRAIN_ID_SIZE+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
+				classnode.setLearning_id_set(testing,training);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\"+LEARN_ID_SIZE+"_"+labelid+"_learningid.txt",classnode.getLearning_id_set());
+			}
+		}
+	}
 	//从UserInfo.txt中根据用户属性获取TESTID
 	public static void tmp_setTestID() throws IOException {
 		File srcf = new File(Config.SrcPath_Root+"UserInfo0_MuteUser.txt");

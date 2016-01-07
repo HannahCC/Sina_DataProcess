@@ -14,8 +14,8 @@ import org.cl.utils.SaveInfo;
 
 public class GetUserFeature {
 
-	public static Map<ClassiferNode,Map<String,String>> classifer_user_map = new HashMap<ClassiferNode,Map<String, String>>();
-	public static List<String> classifers = Config.CLASSIFERS;
+	public static final Map<ClassiferNode,Map<String,String>> classifer_user_map = new HashMap<ClassiferNode,Map<String, String>>();
+	public static final List<String> classifers = Config.CLASSIFERS;
 
 	
 	public static void getUserFeatureMap() throws IOException {

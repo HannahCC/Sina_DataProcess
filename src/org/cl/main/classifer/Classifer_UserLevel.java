@@ -7,6 +7,7 @@ import java.util.Map;
 import org.cl.conf.Config;
 import org.cl.model.ClassNode;
 import org.cl.servies.GetCHI;
+import org.cl.servies.GetDF;
 import org.cl.servies.GetIDF;
 import org.cl.servies.GetTrainTestData;
 import org.cl.servies.GetTrainTestID;
@@ -20,11 +21,12 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_SrcType1\\";
+	static String res_dir = "Simple_Src_频次_tfidf\\";
 	public static void main(String[] args) throws IOException{
-		/*Config.SrcPath_Root = args[0];
-		Config.ResPath_Root = args[1];
-		res_dir = args[2];*/
+		/*res_dir = args[0];
+		for(int i=1;i<args.length;i++){
+			Config.CLASSIFERS.add(args[i]);
+		}*/
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		GetUserFeature.getUserFeatureMap();
@@ -50,6 +52,7 @@ public class Classifer_UserLevel {
 			SaveInfo.mkdir(Config.ResPath);
 			GetIDF.getIDF(i,0);
 			GetIDF.getIDF(i,1);
+			GetDF.getDF(i);
 			GetCHI.getCHI(i);
 			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
 			GetTrainTestData.getTTData_UserLevel(label_map);

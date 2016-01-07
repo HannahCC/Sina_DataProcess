@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,7 +65,7 @@ public class ReadInfo {
 	}
 
 	public static List<String> getList(String dir,String filename) throws IOException {
-		List<String> res = new LinkedList<String>();
+		List<String> res = new ArrayList<String>();
 		File f = new File(dir+filename);
 		if(!f.exists())return res;
 		BufferedReader r = new BufferedReader(new FileReader(f));
@@ -154,7 +153,34 @@ public class ReadInfo {
 		br.close();
 		return lines;
 	}
-
+	public static void getMapMap(String filename, Map<String, Map<String, Integer>> map_map,String regex1,String regex2,int key_index) throws IOException {
+		File f1 = new File(filename);
+		BufferedReader br = new BufferedReader(new FileReader(f1));
+		String line;
+		while((line = br.readLine())!=null){
+			String[] items = line.split(regex1);
+			Map<String, Integer> map = new HashMap<String, Integer>();
+			for(int i=key_index+1;i<items.length;i++){
+				String[] items2 = items[i].split(regex2);
+				Utils.putInMap(map, items2[0], Integer.parseInt(items2[1]));
+			}
+			map_map.put(items[key_index], map);
+		}
+		br.close();
+	}
+	public static void getArrayMap(Map<String, double[]> array_map, int size, String filename,String regex1,String regex2,int i,int j) throws IOException {
+		File f1 = new File(filename);
+		BufferedReader br = new BufferedReader(new FileReader(f1));
+		String line;
+		while((line = br.readLine())!=null){
+			double[] array = new double[size];
+			String[] items = line.split(regex1);
+			String[] item = items[j].split(regex2);
+			for(int k=0;k<size;k++){array[k]=Double.parseDouble(item[k]);}
+			array_map.put(items[i], array);
+		}
+		br.close();
+	}
 	public static Map<String,Double> getMapDouble(String dir, String filename,String regex,int key,int value) throws IOException{
 		File f=new File(dir+filename);
 		if(!f.exists())return null;

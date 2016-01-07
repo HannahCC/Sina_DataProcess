@@ -204,7 +204,7 @@ public class Utils {
 		for(List<String> list : lists){
 			if(list==null||list.size()==0)continue;
 			for(String emo : list){
-				str.append(emo);//emo特征向量自带"\\s"
+				str.append(emo+" ");//emo特征向量自带"\\s"
 			}
 		}
 		return str.toString();
@@ -216,6 +216,13 @@ public class Utils {
 		}
 		return str.toString();
 	}
+	public static String array_ToString(double[] array) {
+		StringBuffer str = new StringBuffer();
+		for(double i : array){
+			str.append(" "+i);
+		}
+		return str.toString();
+	}
 	public static String map_toString(int lableid_index, Map<String, StringBuffer> map) {
 		if(map==null||map.size()==0)return null;
 		StringBuffer str = new StringBuffer();
@@ -223,6 +230,16 @@ public class Utils {
 		while(it.hasNext()){
 			Entry<String, StringBuffer> entry = it.next();
 			str.append(lableid_index+"\\s"+entry.getValue().toString()+"\r\n");
+		}
+		return str.toString();
+	}
+	public static String map_toString(Map map) {
+		if(map==null||map.size()==0)return null;
+		StringBuffer str = new StringBuffer();
+		Iterator<Entry> it = map.entrySet().iterator();
+		while(it.hasNext()){
+			Entry entry = it.next();
+			str.append(String.valueOf(entry.getKey())+":"+String.valueOf(entry.getValue())+"\t");
 		}
 		return str.toString();
 	}
@@ -276,7 +293,7 @@ public class Utils {
 		}
 	}
 	//按降序排列
-	public static void mapSortByValue(List<String> list,Map<String,Double> map) {
+	public static void mapSortByValueDouble(List<String> list,Map<String,Double> map) {
 		List<Entry<String,Double>> list_tmp = new ArrayList<Entry<String,Double>>(map.entrySet());
 		Collections.sort(list_tmp,new Comparator<Entry<String,Double>>(){
 			public int compare(Entry<String,Double> arg0,Entry<String,Double> arg1) {
@@ -292,7 +309,7 @@ public class Utils {
 		}
 	}
 	//按降序排列
-	public static void mapSortByValue(List<String> list,Map<String,Double> map,final Map<String, Integer> additional_map) {
+	public static void mapSortByValueDouble(List<String> list,Map<String,Double> map,final Map<String, Integer> additional_map) {
 		List<Entry<String,Double>> list_tmp = new ArrayList<Entry<String,Double>>(map.entrySet());
 		Collections.sort(list_tmp,new Comparator<Entry<String,Double>>(){
 			public int compare(Entry<String,Double> arg0,Entry<String,Double> arg1) {
@@ -317,7 +334,8 @@ public class Utils {
 			list.add(item);
 		}
 	}
-	public static void mapSortByValue(Map<String, Double> map,double threshold) {
+	
+	public static void mapSortByValueDouble(Map<String, Double> map,double threshold) {
 		List<Entry<String,Double>> list_tmp = new ArrayList<Entry<String,Double>>(map.entrySet());
 		Collections.sort(list_tmp,new Comparator<Entry<String,Double>>(){
 			public int compare(Entry<String,Double> arg0,Entry<String,Double> arg1) {
@@ -432,6 +450,12 @@ public class Utils {
 	public static void putInMap(Map<String, StringBuffer> map,String id, String string) {
 		if(map.containsKey(id)){map.put(id, map.get(id).append(string));}
 		else{map.put(id, new StringBuffer(string));}
+	}
+	public static int indexOfArray(int[] array, int label) {
+		for(int i=0;i<array.length;i++){
+			if(array[i]==label)return i;
+		}
+		return -1;
 	}
 
 }

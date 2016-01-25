@@ -97,7 +97,7 @@ public class GetTrainTestData {
 				String reencoded_feature = Utils.reencode(feature_list,start_index);//从start_index开始重新编码，并按编码大小从小到大排序
 				Utils.putInMap(id_feature, id, reencoded_feature);
 			}
-			start_index += classifer.getClassifer_size();
+			start_index += classifer.getClassifer_size() + 1;
 		}
 		SaveInfo.data_writer(labelid,id_feature,data_type);
 	}

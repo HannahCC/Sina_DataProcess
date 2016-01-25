@@ -83,13 +83,26 @@ public class SaveInfo {
 			e.printStackTrace();
 		}
 	}
-
 	public static void id_writer(String filename, Set<String> id_set) {
 		File f = new File(filename);
 		try {
 			BufferedWriter w = new BufferedWriter(new FileWriter(f));
 			for(String id : id_set){
 				w.write(id+"\r\n");
+			}
+			w.flush();
+			w.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void id_writer(String filename, Set<String> id_set, int label, boolean append) {
+		File f = new File(filename);
+		try {
+			BufferedWriter w = new BufferedWriter(new FileWriter(f, append));
+			for(String id : id_set){
+				w.write(id+"\t"+label+"\r\n");
 			}
 			w.flush();
 			w.close();

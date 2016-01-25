@@ -82,7 +82,7 @@ public class GetTrainTestID {
 				SaveInfo.id_writer(Config.Public_Info+i+"\\"+labelid+"_testingid"+".txt",classnode.getTesting_id_set());
 
 				//获取固定的size的数据作为训练数据
-				classnode.setTrainning_id_set(i);
+				classnode.setTrainning_id_set(i); //4份作为训练数据
 				SaveInfo.id_writer(Config.Public_Info+i+"\\"+TRAIN_ID_SIZE+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
 			}
 		}
@@ -185,6 +185,24 @@ public class GetTrainTestID {
 				SaveInfo.id_writer(Config.Public_Info+i+"\\"+TRAIN_ID_SIZE+"_"+labelid+"_trainingid.txt",classnode.getTrainning_id_set());
 				classnode.setLearning_id_set(testing,training);
 				SaveInfo.id_writer(Config.Public_Info+i+"\\"+LEARN_ID_SIZE+"_"+labelid+"_learningid.txt",classnode.getLearning_id_set());
+			}
+		}
+	}
+	public static void setTrain_Test_LearnID2() throws IOException {
+		for(int labelid : LABELS){
+			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
+			ClassNode classnode = new ClassNode(labelid,id_set_list);
+			for(int i=0;i<FOLD;i++){  //每折使用其中1组作为测试，另外FOLD-1组作为训练
+				int testing = i;
+				int training = (i+1)%FOLD;
+				SaveInfo.mkdir(Config.Public_Info+i);
+				classnode.setTesting_id_set(testing);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\testing_id"+".txt",classnode.getTesting_id_set(),labelid, true);//1份为testing
+				//获取固定的size的数据作为训练数据
+				classnode.setTrainning_id_set(id_set_list.get(training));
+				SaveInfo.id_writer(Config.Public_Info+i+"\\learning_id.txt",classnode.getTrainning_id_set(),labelid, true);//1份为learning
+				classnode.setLearning_id_set(testing,training);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\training_id.txt",classnode.getLearning_id_set(),labelid, true);//3份为training
 			}
 		}
 	}

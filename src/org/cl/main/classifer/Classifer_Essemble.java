@@ -17,12 +17,11 @@ public class Classifer_Essemble {
 	static String svm_type = Config.SVM_TYPE;
 	static double[] weights = {1,1,1,1,1,1,1,1,1,1,1};//new double[10];
 	static String res_dir;
-	static String[] classfiers = {"TagVecCon","AppTopic_train_2000_100_nvabg_AVG·100","LFDMMVFriTopic_train_2000_100_100_0.6"};
-	//static String[] classfiers = {"Fri_Tag","Fol_Tag","Fri_Description","Fol_Description"};
-	
-	/*static String[] classfiers = {"vecAll_line","Tag_AvgVecIn18w","Tag","Fri_Tag","Fol_Tag",
-		"Description_AvgVecIn18w","Description","Fri_Description","Fol_Description","ScreenName","Fri_Fol_Tag","Fri_Fol_Description"};*/
+	//static String[] classfiers = {"TagAvgVec_inFriVec","VFriType","SrcType1","ScreenName1gramAvgVec_inFriVec"};
+	static String[] classfiers = {"Tag","Src"};
 	public static void main(String[] args) throws InterruptedException, IOException{
+		classfiers = args;
+		
 		/*weights[0] = 0.1;
 		for(int j=1;j<classfiers.length;j++){
 			weights[j] = (1-weights[0])/8;

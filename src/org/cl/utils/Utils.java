@@ -65,7 +65,7 @@ public class Utils {
 	}
 	public static List<Set<String>> spilt(Set<String> id_set, int fold) {
 		int num = id_set.size();
-		int i_num = num/fold;
+		int i_num = num/(float)fold > num/fold + 0.5 ? num/fold+1 : num/fold ;
 		List<Set<String>> id_set_list = new ArrayList<Set<String>>();
 		Set<String> id_set_i = new TreeSet<String>();
 		int i=0;

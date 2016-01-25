@@ -13,33 +13,14 @@ public class Predict {
 	public static boolean isAverage = true;
 
 	public static void main(String args[]) throws InterruptedException, IOException{
-		/*String[] classifers = {"Simple_vec1st_sample10_d128_line","Simple_vec2nd_sample10_d128_line","Simple_vecAll_sample10_d128_line",
-				"Simple_vec1st_sample10000_d128_line","Simple_vec2nd_sample10000_d128_line","Simple_vecAll_sample10000_d128_line",
-				"Simple_vec1st_sample10000_d256_line","Simple_vec2nd_sample10000_d256_line","Simple_vecAll_sample10000_d256_line",
-				"Simple_Tag","Simple_Tag_AvgVecIn18w","Simple_Tag_ConcVecIn18w","Simple_Tag_AvgVecIn200w","Simple_Tag_ConcVecIn200w",
-				"Simple_Fri_Tag","Simple_Fol_Tag","Simple_Fri_Fol_Tag","Simple_Fri_Tag_withself","Simple_Fol_Tag_withself","Simple_Fri_Fol_Tag_withself",
-				"Simple_Description","Simple_Description_AvgVecIn18w","Simple_Description_ConcVecIn18w","Simple_Description_AvgVecIn200w","Simple_Description_ConcVecIn200w",
-				"Simple_Fri_Description","Simple_Fol_Description","Simple_Fri_Fol_Description","Simple_Fri_Description_withself","Simple_Fol_Description_withself","Simple_Fri_Fol_Description_withself",
-				"Simple_vecAll_sample10000_d128_tag_200w","Simple_vecAll_sample10000_d128_desc_200w","Simple_vecAll_sample10000_d128_desc_tag_200w",
-				"Simple_vecAll_sample10000_d128_line_desc_tag_200w","Simple_vecAll_sample10000_d128_line1.5_desc_tag_200w","Simple_vecAll_sample10000_d128_line2_desc_tag_200w",
-				"Simple_vecAll_sample10000_d128_tag_18w","Simple_vecAll_sample10000_d128_desc_18w","Simple_vecAll_sample10000_d128_desc_tag_18w",
-				"Simple_vecAll_sample10000_d128_line_desc_tag_18w","Simple_vecAll_sample10000_d128_line1.5_desc_tag_18w","Simple_vecAll_sample10000_d128_line2_desc_tag_18w",
-		};*/
-		/*String[] classifers = {"Simple_Tag","Simple_Fri_Tag","Simple_Fol_Tag","Simple_Fri_Fol_Tag","Simple_Fri_Tag_withself","Simple_Fol_Tag_withself","Simple_Fri_Fol_Tag_withself",
-		"Simple_Description","Simple_Fri_Description","Simple_Fol_Description","Simple_Fri_Fol_Description","Simple_Fri_Description_withself","Simple_Fol_Description_withself","Simple_Fri_Fol_Description_withself",
-		};*/
-		/*String[] classifers = {"Simple_vecAll_sample10000_d128_line4_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line4_desc_tag_conc_18w",
-		"Simple_vecAll_sample10000_d128_line5_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line5_desc_tag_conc_18w",
-		"Simple_vecAll_sample10000_d128_line6_desc_tag_avg_18w","Simple_vecAll_sample10000_d128_line6_desc_tag_conc_18w"
-		};*/
-		String[] classifers = {"Simple_Src_频次_tfidf"};
+		//String[] classifers = {"MutiFeature_Tag+Src"};
+		String[] classifers = args;
 		for(String classifer : classifers){
-
-		/*for(int i=0;i<args.length;i++){
-			String classifer = args[i];*/
 			Config.ResPath = Config.ResPath_Root + classifer +"\\"; 
-			singleTrain("",0,5,"training_data");//"training_data");
+			singleTrain("",0,5,"training_data");
 			singlePredict("",0,5,"testing_data","result");
+			/*singleTrain("",0,1,"rbm_training_data");
+			singlePredict("",0,1,"rbm_testing_data","rbm_result");*/
 			//singlePredict("",0,5,"learning_data","learning_result");
 			//singleGetF1("",0,5,"testing_id","result");
 			//singleGetUserNoFeature("",0,5,"training_data","testing_data");

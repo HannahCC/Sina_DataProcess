@@ -18,14 +18,15 @@ public class GetPublicInfo {
 		//GetTrainTestID.tmp_setTrain_TestID(0.8f);
 		//GetTrainTestID.tmp_setTrain_TestID("82");
 		//GetTrainTestID.tmp_setTestID();
-		//GetTrainTestID.setTrain_TestID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练
+		GetTrainTestID.setTrain_TestID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练
 		//GetTrainTestID.setTrain_TestID_diffSize_byFOLD();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份中1份或2份、3份、4份为训练，已验证不同训练数据数量下模型效果
 		//GetTrainTestID.setTrain_TestID_diffSize_bySIZE();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份中共抽取TRAIN_ID_SIZE_ARR个数据为训练数据
 		//GetTrainTestID.setTrain_TestID_1vsall();//获取除labelid以外的类用户的ID组成的800个ID，分成5组
-		GetTrainTestID.setTrain_Test_LearnID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练
+		//GetTrainTestID.setTrain_Test_LearnID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，3份学习，1份为训练
+		//GetTrainTestID.setTrain_Test_LearnID2();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，1份学习，3份为训练  格式与前面不同
 		
 		/*----获取LABELS中所有类用户区分时的idf和chi------*/
-		GetUserFeature.getUserFeatureMap();
+		/*GetUserFeature.getUserFeatureMap();
 		for(int i=0;i<Config.FOLD;i++){
 			for(int size : Config.TRAIN_ID_SIZE_ARR){//不同train_size
 				//GetCHI.calculateCHI(i,size);//根据chi求解公式求出每一类用户，每个特征的chi值，并将各特征按chi降序排列，存储在[train_id_size]_[labelid]_[CLASSFIERS]chi.txt 或者 [train_id_size]_[非labelid]_[labelid]_[CLASSFIERS]chi.txt 
@@ -33,7 +34,7 @@ public class GetPublicInfo {
 				GetIDF.calculateIDF(i,size,0);//根据各特征出现在测试用户文档集中的文档数，得到该特征的idf值，存储在[train_id_size]_[combination]_[classifername]_[typename]idf.txt中
 				GetIDF.calculateIDF(i,size,1);//根据各特征出现在训练用户文档集中的文档数，得到该特征的idf值
 			}
-		}
+		}*/
 		
 		/*----获取1vs1的idf和chi------*/
 		/*for(int i=0;i<Config.FOLD;i++){

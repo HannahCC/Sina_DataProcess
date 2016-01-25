@@ -45,6 +45,21 @@ public class GetUserFeature {
 
 	public static int getFeatureSize(String classfier) throws IOException{
 		int size = 0;
+		File f = new File(Config.SrcPath_Root+"\\Config\\Feature_Size.txt");
+		BufferedReader r = new BufferedReader(new FileReader(f));
+		String line = "";
+		while((line = r.readLine())!=null){
+			if(!line.equals("")){
+				String[] items = line.split("\t");
+				if(items[0].equals(classfier)){size = Integer.parseInt(items[1]);break;}
+			}
+		}
+		r.close();
+		return size;
+	}
+	
+	/*public static int getFeatureSize(String classfier) throws IOException{
+		int size = 0;
 		File f = new File(Config.SrcPath_Root+"\\Config\\Dict_"+classfier+".txt");
 		if(!f.exists()){
 			System.out.println(classfier+"has not dict.we can't get the feature_size!");
@@ -57,6 +72,6 @@ public class GetUserFeature {
 		}
 		r.close();
 		return size+1;//因为编号是从0开始，所以size+1
-	}
+	}*/
 
 }

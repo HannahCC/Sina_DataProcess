@@ -21,12 +21,13 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_Src_频次_tfidf\\";
+	static String res_dir = "MutiFeature_TagAvgVec+SrcNewType\\";
 	public static void main(String[] args) throws IOException{
-		/*res_dir = args[0];
+		res_dir = args[0];
 		for(int i=1;i<args.length;i++){
 			Config.CLASSIFERS.add(args[i]);
-		}*/
+		}
+		
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		GetUserFeature.getUserFeatureMap();

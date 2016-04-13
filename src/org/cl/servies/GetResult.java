@@ -28,7 +28,7 @@ public class GetResult {
 		getActualRes(path,"\\"+test_data_file+".txt",testing_id,id_res,"\t",0);// UID:实际lable
 		
 		//UID:实际lable##[预测label##预测置信度]  为id_res增加[]内的内容
-		File f = new File(path,"\\"+result_file+"_"+Config.SVM_TYPE+".txt");
+		File f = new File(path,"\\"+result_file+"_"+Config.CLASSIFIER_TYPE+".txt");
 		BufferedReader r = new BufferedReader(new FileReader(f));
 		String line = "";
 		int j = 0;
@@ -44,14 +44,14 @@ public class GetResult {
 	}
 	
 	public static double getEssembleResult(String fold_i, String src_dir, String res_dir, String dir,String[] classfiers) throws IOException {
-		String svm_type = Config.SVM_TYPE;
+		String svm_type = Config.CLASSIFIER_TYPE;
 		Map<String,String> id_actual_res = new TreeMap<String, String>();
 		Map<String,ResultNode> id_predict_res = new TreeMap<String, ResultNode>();
 		for(String classfier : classfiers){
 			// testing_id.txt testing_data.txt result_lg.txt 同一行为同一个用户
-			List<String> testing_id = ReadInfo.getList(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\testing_id.txt","\\s",0);
-			GetResult.getActualRes(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\testing_data.txt",testing_id,id_actual_res,"\t",0);
-			GetResult.getPredictRes(Config.ResPath_Root+src_dir+"Simple_"+classfier+"\\"+dir+fold_i,"\\result_"+svm_type+".txt",testing_id,id_predict_res,1);
+			List<String> testing_id = ReadInfo.getList(Config.ResPath_Root+src_dir+classfier+"\\"+dir+fold_i,"\\testing_id.txt","\\s",0);
+			GetResult.getActualRes(Config.ResPath_Root+src_dir+classfier+"\\"+dir+fold_i,"\\testing_data.txt",testing_id,id_actual_res,"\t",0);
+			GetResult.getPredictRes(Config.ResPath_Root+src_dir+classfier+"\\"+dir+fold_i,"\\result_"+svm_type+".txt",testing_id,id_predict_res,1);
 		}
 		SaveInfo.result_writer(Config.ResPath_Root+res_dir+dir,"final_result_"+fold_i+"_"+svm_type+".txt","final_testing_id_"+fold_i+".txt",id_actual_res,id_predict_res);
 		double accuracy =  GetResult.getAccuracy(id_actual_res,id_predict_res);

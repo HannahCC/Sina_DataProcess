@@ -19,7 +19,7 @@ public class Cmd_Train {
 		try {//svm-train .\1\training_data.txt
 			String cmdStr = "";
 			String svm_path = Config.ResDir+"SVM\\";
-			String type = Config.SVM_TYPE;
+			String type = Config.CLASSIFIER_TYPE;
 			if(type.equals("lg")){
 				cmdStr = "cmd /k "+svm_path+"train -s 0 "+path+train_data_file+".txt";;
 			}else if(type.equals("svm")){

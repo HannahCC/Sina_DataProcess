@@ -51,7 +51,7 @@ public class Cmd_Predict {
 	private static String getCmdStr(String path, String test_data_file,String result_file) {
 		String save_path = Config.ResDir+"SVM\\";
 		String cmdStr = "";
-		String type = Config.SVM_TYPE;
+		String type = Config.CLASSIFIER_TYPE;
 		if(type.equals("lg")){
 			cmdStr = "cmd /k "+save_path+"predict -b 1 "
 					+path+"\\"+test_data_file+".txt "

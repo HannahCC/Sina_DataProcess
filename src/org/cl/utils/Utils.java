@@ -13,11 +13,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
 public class Utils {
 	static DecimalFormat df = new DecimalFormat("0.0000000000");
@@ -87,9 +87,9 @@ public class Utils {
 	}
 	//从数据集id_set中选取count个数据作为子集
 	public static Set<String> subSet(Set<String> id_set,int count) {
-		Set<String> new_set = new TreeSet<String>();
 		int n = id_set.size();
 		if(count>=n){return id_set;}
+		Set<String> new_set = new TreeSet<String>();
 		for(String id : id_set){
 			new_set.add(id);
 			if(new_set.size()==count)break;

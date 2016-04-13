@@ -13,7 +13,7 @@ public class Predict {
 	public static boolean isAverage = true;
 
 	public static void main(String args[]) throws InterruptedException, IOException{
-		//String[] classifers = {"MutiFeature_Tag+Src"};
+		//String[] classifers = {"Simple_FriTagAvgVec"};
 		String[] classifers = args;
 		for(String classifer : classifers){
 			Config.ResPath = Config.ResPath_Root + classifer +"\\"; 
@@ -50,8 +50,8 @@ public class Predict {
 		}
 		if(isAverage){
 			average /= n;
-			SaveInfo.option_log(Config.SVM_TYPE+" accuracy average="+average);
-			SaveInfo.res_log(Config.SVM_TYPE+" accuracy average="+average,false);
+			SaveInfo.option_log(Config.CLASSIFIER_TYPE+" accuracy average="+average);
+			SaveInfo.res_log(Config.CLASSIFIER_TYPE+" accuracy average="+average,false);
 		}
 	}
 	/*public static void singleGetF1(String dir, int s, int n,String test_id_file,String result_file) throws IOException {

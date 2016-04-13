@@ -12,19 +12,20 @@ public class Classifer_Essemble {
 	 * @param args
 	 * @throws InterruptedException
 	 */
-
+	
 	static int fold = Config.FOLD;
-	static String svm_type = Config.SVM_TYPE;
+	static String classifier_type = Config.CLASSIFIER_TYPE;
 	static double[] weights = {1,1,1,1,1,1,1,1,1,1,1};//new double[10];
+	static String src_dir = "CNNWord_";//"Simple_";//"";//
 	static String res_dir;
-	//static String[] classfiers = {"TagAvgVec_inFriVec","VFriType","SrcType1","ScreenName1gramAvgVec_inFriVec"};
-	static String[] classfiers = {"Tag","Src"};
+	//static String[] classfiers = null;//{"VFri","Win8_L100_TagAvgVec","SrcAvgVec_Baike"};
+	static String[] classfiers = {"TagVec_3",/*"SrcVec",*/"FriVec"};
 	public static void main(String[] args) throws InterruptedException, IOException{
-		classfiers = args;
+		//classfiers = args;
 		
-		/*weights[0] = 0.1;
+		/*weights[0] = 0.5;
 		for(int j=1;j<classfiers.length;j++){
-			weights[j] = (1-weights[0])/8;
+			weights[j] = (1-weights[0])/2;
 		}*/
 		
 		res_dir = "MutiClassifer";
@@ -62,7 +63,7 @@ public class Classifer_Essemble {
 	public static void cross_validation(String dir) throws IOException{
 		double aver = 0;
 		for(int i=0;i<fold;i++){
-			double accuracy =  GetResult.getEssembleResult(i+"", "", res_dir, dir,classfiers);
+			double accuracy =  GetResult.getEssembleResult(i+"", src_dir, res_dir, dir,classfiers);
 			aver+=accuracy;
 		}
 		aver/=fold;

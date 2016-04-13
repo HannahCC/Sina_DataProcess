@@ -21,7 +21,7 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "MutiFeature_TagAvgVec+SrcNewType\\";
+	static String res_dir = "Simple_FriAvgVec\\";
 	public static void main(String[] args) throws IOException{
 		res_dir = args[0];
 		for(int i=1;i<args.length;i++){

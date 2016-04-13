@@ -188,6 +188,20 @@ public class GetTrainTestID {
 			}
 		}
 	}
+	public static void setTrain_TestID2() throws IOException {
+		for(int labelid : LABELS){
+			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
+			ClassNode classnode = new ClassNode(labelid,id_set_list);
+			for(int i=0;i<FOLD;i++){  //每折使用其中1组作为测试，另外FOLD-1组作为训练
+				SaveInfo.mkdir(Config.Public_Info+i);
+				classnode.setTesting_id_set(i);
+				SaveInfo.id_writer(Config.Public_Info+i+"\\testing_id.txt",classnode.getTesting_id_set(),labelid, true);//1份为testing
+				
+				classnode.setTrainning_id_set(i); //4份作为训练数据
+				SaveInfo.id_writer(Config.Public_Info+i+"\\training_id.txt",classnode.getTrainning_id_set(),labelid, true);//4份为training
+			}
+		}
+	}
 	public static void setTrain_Test_LearnID2() throws IOException {
 		for(int labelid : LABELS){
 			List<Set<String>> id_set_list = getIDSetList(labelid);//得到一类用户所有的ID，分为FOLD组，分别装在Set中。
@@ -296,8 +310,8 @@ public class GetTrainTestID {
 	 * @throws IOException 
 	 */
 	private static List<Set<String>> getIDSetList(int labelid) throws IOException {
-		Set<String> id_set = ReadInfo.getSet(Config.UserID,labelid+".txt");
-		//id_set = Utils.subSet(id_set, ID_NUMBER);//从id_set中随机取id_number个数据作为新的id_set，最多取id_set.size()个
+		Set<String> id_set = ReadInfo.getSet(Config.UserID,labelid+"_old2_new.txt");//"_newest_unequal.txt");
+		//id_set = Utils.subSet(id_set, ID_NUMBER);//从id_set中取id_number个数据作为新的id_set，最多取min(id_set.size(),ID_NUMBER)个
 		List<Set<String>>id_set_list = Utils.spilt(id_set, FOLD);//将id_set分成fold组
 		return id_set_list;
 	}

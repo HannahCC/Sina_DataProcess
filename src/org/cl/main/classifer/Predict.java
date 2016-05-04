@@ -13,8 +13,9 @@ public class Predict {
 	public static boolean isAverage = true;
 
 	public static void main(String args[]) throws InterruptedException, IOException{
-		//String[] classifers = {"Simple_FriTagAvgVec"};
-		String[] classifers = args;
+		String[] classifers = {"Simple_FriAvgVec_skn10wc200l100i15_Train-Test","Simple_FriAvgVec_skn10wc200l100i15_Train",
+				"Simple_FriAvgVec_skn10wc200l100i15_Train+Test","Simple_FriAvgVec_skn15wc200l100i15_Train+Test","Simple_FriAvgVec_skn5wc200l100i15_Train+Test",};
+		//String[] classifers = args;
 		for(String classifer : classifers){
 			Config.ResPath = Config.ResPath_Root + classifer +"\\"; 
 			singleTrain("",0,5,"training_data");

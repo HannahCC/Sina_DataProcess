@@ -76,6 +76,7 @@ public class GetTrainTestData {
 			String classifer_name = classifer.getClassifer_name();
 			for(String id : id_set){
 				if(!feature_map.containsKey(id)||feature_map.get(id).length()==0){SaveInfo.option_log(id+"---没有特征----"+classifer_name);continue;}
+				String tmp = feature_map.get(id);
 				List<String> feature_list = Utils.stringFeaturetoList(feature_map.get(id));
 				//进行特征选择，当未获取该Classifer的各特征的CHI时不会进行特征选择
 				//训练用户才能使用CHI进行筛选，对测试用户若使用CHI，即隐式的使用了训练用户的信息。因为每次筛选时是根据测试用户类别选择所用的CHI列表，即我们提前知道了测试用户的类别。

@@ -310,7 +310,7 @@ public class GetTrainTestID {
 	 * @throws IOException 
 	 */
 	private static List<Set<String>> getIDSetList(int labelid) throws IOException {
-		Set<String> id_set = ReadInfo.getSet(Config.UserID,labelid+"_old2_new.txt");//"_newest_unequal.txt");
+		Set<String> id_set = ReadInfo.getSet(Config.UserID,labelid+Config.UserID_Suffix);//"_newest_unequal.txt");
 		//id_set = Utils.subSet(id_set, ID_NUMBER);//从id_set中取id_number个数据作为新的id_set，最多取min(id_set.size(),ID_NUMBER)个
 		List<Set<String>>id_set_list = Utils.spilt(id_set, FOLD);//将id_set分成fold组
 		return id_set_list;

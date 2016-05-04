@@ -21,18 +21,20 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_FriAvgVec\\";
+	static String res_dir = "Simple_FriAvgVec_skn10wc200l100i15_Train\\";
 	public static void main(String[] args) throws IOException{
-		res_dir = args[0];
+		/*res_dir = args[0];
 		for(int i=1;i<args.length;i++){
 			Config.CLASSIFERS.add(args[i]);
-		}
+		}*/
 		
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
-		GetUserFeature.getUserFeatureMap();
+		//GetUserFeature.getUserFeatureMap();
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
-		cross_validation("");
+		//cross_validation("");
+		/*---------------------------------每折用户的特征不相同-----------------------------------*/
+		cross_validation_dynamicFeature("");
 		/*---------------------------------比较不同chi取值的情况---------------------------------*/
 		//allLabel_varCHI();
 		/*---------------------------------diff_train_id_size--------------------------------*/
@@ -59,7 +61,21 @@ public class Classifer_UserLevel {
 			GetTrainTestData.getTTData_UserLevel(label_map);
 		}
 	}
-
+	
+	private static void cross_validation_dynamicFeature(String dir) throws IOException{
+		for(int i=0;i<Config.FOLD;i++){
+			SaveInfo.option_log("------------------------fold-"+i+"--------------------");
+			GetUserFeature.getUserFeatureMap(i);
+			Config.ResPath = Config.ResPath_Root+res_dir+dir+i+"//";
+			SaveInfo.mkdir(Config.ResPath);
+			GetIDF.getIDF(i,0);
+			GetIDF.getIDF(i,1);
+			GetDF.getDF(i);
+			GetCHI.getCHI(i);
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
+			GetTrainTestData.getTTData_UserLevel(label_map);
+		}
+	}
 
 	public static void OnevsOne() throws IOException {
 		int k = 0;

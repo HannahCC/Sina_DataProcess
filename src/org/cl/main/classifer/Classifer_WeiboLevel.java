@@ -38,17 +38,17 @@ public class Classifer_WeiboLevel {
 			k++;
 		}
 		*/
-		cross_validation("");
+		cross_validation(Config.TRAIN_ID_SIZE,"");
 		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
 	}
 	
 	
-	public static void cross_validation(String dir) throws IOException{
+	public static void cross_validation(int train_id_size, String dir) throws IOException{
 		for(int i=0;i<Config.FOLD;i++){
 			SaveInfo.option_log("------------------------fold-"+i+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+dir+i+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i,train_id_size);
 			GetTrainTestData.getTTData_WeiboLevel(label_map);
 			Cmd_Train.train(Config.ResPath,"training_data");
 		}

@@ -21,24 +21,26 @@ public class Classifer_UserLevel {
 	 * @throws IOException 
 	 * @throws InterruptedException
 	 */
-	static String res_dir = "Simple_FriAvgVec_skn10wc200l100i15_Train\\";
+	static String res_dir = "Simple_Self+SFriAvgVec_skn5wcr100l100i15_3Train-test\\";
 	public static void main(String[] args) throws IOException{
-		/*res_dir = args[0];
-		for(int i=1;i<args.length;i++){
+		Config.TRAIN_ID_SIZE = Integer.parseInt(args[0]);
+		res_dir = args[1];
+		for(int i=2;i<args.length;i++){
 			Config.CLASSIFERS.add(args[i]);
-		}*/
+		}
 		
 		Config.ResPath = Config.ResPath_Root+res_dir;
 		SaveInfo.mkdir(Config.ResPath);
 		//GetUserFeature.getUserFeatureMap();
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
-		//cross_validation("");
+		//cross_validation(Config.TRAIN_ID_SIZE,"");
 		/*---------------------------------每折用户的特征不相同-----------------------------------*/
-		cross_validation_dynamicFeature("");
+		cross_validation_dynamicFeature(Config.TRAIN_ID_SIZE,"");//Config.TRAIN_ID_SIZE
 		/*---------------------------------比较不同chi取值的情况---------------------------------*/
 		//allLabel_varCHI();
 		/*---------------------------------diff_train_id_size--------------------------------*/
 		//allLabel_varTrainSize();
+		//allLabel_varTrainSize_dynamicFeature();
 		/*-----------------------------------1vs1--------------------------------------------*/
 		//OnevsOne();
 		/*-----------------------------------1vs1-varCHI-------------------------------------*/
@@ -48,7 +50,7 @@ public class Classifer_UserLevel {
 
 		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
 	}
-	private static void cross_validation(String dir) throws IOException{
+	private static void cross_validation(int train_id_size, String dir) throws IOException{
 		for(int i=0;i<Config.FOLD;i++){
 			SaveInfo.option_log("------------------------fold-"+i+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+dir+i+"//";
@@ -57,12 +59,12 @@ public class Classifer_UserLevel {
 			GetIDF.getIDF(i,1);
 			GetDF.getDF(i);
 			GetCHI.getCHI(i);
-			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i, train_id_size);
 			GetTrainTestData.getTTData_UserLevel(label_map);
 		}
 	}
 	
-	private static void cross_validation_dynamicFeature(String dir) throws IOException{
+	private static void cross_validation_dynamicFeature(int train_id_size, String dir) throws IOException{
 		for(int i=0;i<Config.FOLD;i++){
 			SaveInfo.option_log("------------------------fold-"+i+"--------------------");
 			GetUserFeature.getUserFeatureMap(i);
@@ -72,7 +74,7 @@ public class Classifer_UserLevel {
 			GetIDF.getIDF(i,1);
 			GetDF.getDF(i);
 			GetCHI.getCHI(i);
-			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i);
+			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(i, train_id_size);
 			GetTrainTestData.getTTData_UserLevel(label_map);
 		}
 	}
@@ -89,7 +91,7 @@ public class Classifer_UserLevel {
 				SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 				Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 				SaveInfo.mkdir(Config.ResPath);
-				cross_validation(k+"//");
+				cross_validation(Config.TRAIN_ID_SIZE, k+"//");
 				k++;
 			}
 		}
@@ -113,7 +115,7 @@ public class Classifer_UserLevel {
 					SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 					Config.ResPath = Config.ResPath_Root+res_dir+k+"//"+m+"//";
 					SaveInfo.mkdir(Config.ResPath);
-					cross_validation(k+"//"+m+"//");
+					cross_validation(Config.TRAIN_ID_SIZE, k+"//"+m+"//");
 					m++;
 				}
 			}
@@ -132,7 +134,7 @@ public class Classifer_UserLevel {
 			SaveInfo.option_log("---------------------label-"+Config.LABELS[0]+"vs"+Config.LABELS[1]+"-------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			cross_validation(k+"//");	
+			cross_validation(Config.TRAIN_ID_SIZE, k+"//");	
 			k++;
 		}
 	}
@@ -145,7 +147,7 @@ public class Classifer_UserLevel {
 			SaveInfo.option_log("------------------------threshold-"+threshold+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			cross_validation(k+"\\");
+			cross_validation(Config.TRAIN_ID_SIZE, k+"\\");
 			k++;
 		}
 	}
@@ -156,9 +158,19 @@ public class Classifer_UserLevel {
 			SaveInfo.option_log("------------------------train_id_size-"+size+"--------------------");
 			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
 			SaveInfo.mkdir(Config.ResPath);
-			cross_validation(k+"\\");
+			cross_validation(size, k+"\\");
 			k++;
 		}
 	}
-
+	
+	public static void allLabel_varTrainSize_dynamicFeature() throws IOException {
+		int k = 0;
+		for(int size : Config.TRAIN_ID_SIZE_ARR){
+			SaveInfo.option_log("------------------------train_id_size-"+size+"--------------------");
+			Config.ResPath = Config.ResPath_Root+res_dir+k+"//";
+			SaveInfo.mkdir(Config.ResPath);
+			cross_validation_dynamicFeature(size, k+"\\");
+			k++;
+		}
+	}
 }

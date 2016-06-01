@@ -1,8 +1,11 @@
 package org.cl.model;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.cl.conf.Config;
 
 public class ClassNode {
 	//int id_set_size = -1;
@@ -39,12 +42,22 @@ public class ClassNode {
 	}
 	//从id_set_list选第i组以外的组作为训练ID
 	public void setTrainning_id_set(int i) {
-		this.trainning_id_set = new TreeSet<String>();
+		this.trainning_id_set = new HashSet<String>();
 		for(int j=0;j<id_set_list.size();j++){
 				if(j!=i){merge(trainning_id_set,id_set_list.get(j));}
 		}
 	}
 	//从id_set_list选第i组以外 选num组作为训练ID
+	public void setTrainning_id_set_byfold(int i,int num) {
+		this.trainning_id_set = new TreeSet<String>();
+		int index = (i+1)%Config.FOLD;
+		for(int j=0;j<num;j++){
+			if(index==i){System.out.println("error!!!!!!!!!!training data is the same with testing data!");}
+			merge(trainning_id_set,id_set_list.get(index));
+			index = (index+1)%Config.FOLD;
+		}
+	}
+	/*//从id_set_list选第i组以外 选num组作为训练ID,会导致不同fold的部分fold 的training data相同
 	public void setTrainning_id_set_byfold(int i,int num) {
 		this.trainning_id_set = new TreeSet<String>();
 		int n = 0;
@@ -55,7 +68,7 @@ public class ClassNode {
 			}
 			if(n==num)break;
 		}
-	}
+	}*/
 	public Set<String> getLearning_id_set() {
 		return learning_id_set;
 	}

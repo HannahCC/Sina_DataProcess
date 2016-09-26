@@ -47,7 +47,7 @@ public class Classifer_TriTrainning {
 		};
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
 		cross_validation();
-		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt",false);
 
 	}
 	public static void cross_validation() throws IOException{

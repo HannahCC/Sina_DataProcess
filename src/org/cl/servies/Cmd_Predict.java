@@ -49,7 +49,7 @@ public class Cmd_Predict {
 
 
 	private static String getCmdStr(String path, String test_data_file,String result_file) {
-		String save_path = Config.ResDir+"SVM\\";
+		String save_path = Config.SVMPath;
 		String cmdStr = "";
 		String type = Config.CLASSIFIER_TYPE;
 		if(type.equals("lg")){

@@ -18,9 +18,6 @@ import org.cl.utils.Utils;
 
 public class GetTrainTestData {
 	public static Map<String, Integer> classifers_weibo_map = null;
-
-
-	static int[] LABELS = Config.LABELS;
 	static int WEIBO_NUMBER = Config.WEIBO_NUMBER;//微博级别的分类器，控制微博数量
 	static Map<Integer,Map<String,Map<String, Double>>> CHI = null;
 	static Map<Integer,Map<String,Map<String, Double>>> DF = null;
@@ -39,8 +36,7 @@ public class GetTrainTestData {
 	}
 	//获取classnode的训练和测试数据（训练用户和测试用户ID已知）
 	public static void getTTData_UserLevel(Map<Integer, ClassNode> label_map) {
-		for(int li=1;li<=LABELS.length;li++){
-			int labelid = LABELS[li-1];
+		for(int labelid : Config.LABELS){
 			ClassNode classnode = label_map.get(labelid);
 			SaveInfo.option_log("--------------label-"+labelid+"-------------");
 			SaveInfo.option_log("------------------------Getting Testing Data--------------------");
@@ -52,8 +48,7 @@ public class GetTrainTestData {
 	}
 
 	public static void getTTData_WeiboLevel(Map<Integer, ClassNode> label_map) throws IOException {
-		for(int li=1;li<=LABELS.length;li++){
-			int labelid = LABELS[li-1];
+		for(int labelid : Config.LABELS){
 			ClassNode classnode = label_map.get(labelid);
 			SaveInfo.option_log("--------------label-"+labelid+"-------------");
 			SaveInfo.option_log("------------------------Getting Testing Data--------------------");

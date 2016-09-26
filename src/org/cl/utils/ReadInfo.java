@@ -2,8 +2,10 @@ package org.cl.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -153,6 +155,22 @@ public class ReadInfo {
 		br.close();
 		return lines;
 	}
+
+	public static void getMap(String filename, HashMap<String,String> map, String seperater,int spilttimes, int idx1, int idx2) throws IOException{
+		File r=new File(filename);
+		BufferedReader br=null;
+		br=new BufferedReader(new FileReader(r));
+		String line="";
+		String[] spilts = null;
+		while((line=br.readLine())!=null)
+		{
+			if(!(line.equals(""))){
+				spilts = line.split(seperater,spilttimes);
+				map.put(spilts[idx1], spilts[idx2]);
+			}
+		}
+		br.close();
+	}
 	public static void getMapMap(String filename, Map<String, Map<String, Integer>> map_map,String regex1,String regex2,int key_index) throws IOException {
 		File f1 = new File(filename);
 		BufferedReader br = new BufferedReader(new FileReader(f1));
@@ -236,5 +254,65 @@ public class ReadInfo {
 		br.close();
 		return lines;
 	}
+	public static Map<String,Set<String>> getLabelIdsMap(String dir,String fileName) throws IOException{
+		 Map<String,Set<String>> labelIdsMap=new HashMap<String,Set<String>>();
+		File f = new File(dir+fileName);
+		BufferedReader r = new BufferedReader(new FileReader(f));
+		String line = "";
+		while((line = r.readLine())!=null){
+			if(line.equals(""))continue;
+			String[] elms=line.split("\\s{1,}");
+			String id=elms[0].trim();
+			String label=elms[1].trim();
+			Set<String> res=labelIdsMap.get(label);
+			if(res==null){
+				res = new HashSet<String>();
+			}
+			res.add(id);
+			labelIdsMap.put(label, res);
+		}
+		r.close();
+		
+		return labelIdsMap;
+	}
+	public static List<String> getneedlist(String filename){
+		List<String> needList = new ArrayList<String>();
+		File file = new File(filename);
+		try {
+			InputStreamReader read = new InputStreamReader(new FileInputStream(file),"utf-8");
+			BufferedReader inOne = new BufferedReader(read);
 
+			String s = null;
+			while((s = inOne.readLine())!=null){
+				needList.add(s);
+			}
+//			System.out.println("the size of file "+filename+"is "+needList.size());
+			inOne.close();
+		}  catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return needList;
+
+	}
+	public static List<String> getneedlist(String filename,String reg,int idx){
+		List<String> needList = new ArrayList<String>();
+		File file = new File(filename);
+		try {
+			InputStreamReader read = new InputStreamReader(new FileInputStream(file),"utf-8");
+			BufferedReader inOne = new BufferedReader(read);
+
+			String s = null;
+			while((s = inOne.readLine())!=null){
+				needList.add(s.split(reg)[idx]);
+			}
+//			System.out.println("the size of file "+filename+"is "+needList.size());
+			inOne.close();
+		}  catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return needList;
+
+	}
 }

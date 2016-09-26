@@ -39,7 +39,7 @@ public class Classifer_WeiboLevel {
 		}
 		*/
 		cross_validation(Config.TRAIN_ID_SIZE,"");
-		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"res.txt",false);
 	}
 	
 	

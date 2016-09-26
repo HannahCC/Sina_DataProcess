@@ -57,7 +57,7 @@ public class Classifer_Essemble {
 			cross_validation(size);
 		}*/
 
-		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"\\res.txt");
+		SaveInfo.log_buff_writer(Config.ResPath_Root+res_dir,"\\res.txt",false);
 	}
 
 	public static void cross_validation(String dir) throws IOException{

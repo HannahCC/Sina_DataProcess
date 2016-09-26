@@ -8,7 +8,7 @@ import org.cl.utils.SaveInfo;
 public class GetPublicInfo {
 	
 	public static void main(String args[]) throws IOException{
-		SaveInfo.mkdir(Config.Public_Info);
+		SaveInfo.mkdir(Config.TrainTestID);
 		//获取UserId
 		//GetUserID.setUserID();//获取每类用户ID各ID_NUMBER个放在USERID_ROOT目录下
 		//GetUserID.setUserIDWeibonumOverN();//获取每类CLASSFIERS特征都有的ID（通过getUserID()得到的ID）,且微博数超过WEIBO_NUMBER的用户,主要用户获取WeiboLevel特征时控制特征个数
@@ -16,9 +16,9 @@ public class GetPublicInfo {
 		//GetTrainTestID.tmp_setTrain_TestID(0.8f);
 		//GetTrainTestID.tmp_setTrain_TestID("82");
 		//GetTrainTestID.tmp_setTestID();
-		GetTrainTestID.setTrain_TestID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练
+		//GetTrainTestID.setTrain_TestID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练
 		//GetTrainTestID.setTrain_TestID2();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份为训练  格式与前面不同(for usertextNN)
-		//GetTrainTestID.setTrain_TestID_diffSize_byFOLD();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份中1份或2份、3份、4份为训练，以验证不同训练数据数量下模型效果
+		GetTrainTestID.setTrain_TestID_diffSize_byFOLD();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份中1份或2份、3份、4份为训练，以验证不同训练数据数量下模型效果
 		//GetTrainTestID.setTrain_TestID_diffSize_bySIZE();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，4份中共抽取TRAIN_ID_SIZE_ARR个数据为训练数据
 		//GetTrainTestID.setTrain_TestID_1vsall();//获取除labelid以外的类用户的ID组成的800个ID，分成5组
 		//GetTrainTestID.setTrain_Test_LearnID();//从筛选过的ID中获取测试和训练用户ID组,分5组，每次取1份为测试，3份学习，1份为训练

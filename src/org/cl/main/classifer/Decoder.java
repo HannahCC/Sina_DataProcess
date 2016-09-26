@@ -29,7 +29,7 @@ public class Decoder {
 		"Feature_Textual\\Text"
 	};
 	public static void main(String args[]) throws IOException{
-		SaveInfo.mkdir(Config.Public_Info+"Decoded\\");
+		SaveInfo.mkdir(Config.TrainTestID+"Decoded\\");
 		String combination = "";
 		for(int labelid : Config.LABELS){combination+=labelid;}
 		combination+="_";
@@ -37,10 +37,10 @@ public class Decoder {
 			for(int labelid : Config.LABELS){
 				for(String classifer : CLASSIFERS){
 					String classifername = classifer.split("\\\\")[1];
-					Map<String,Double> feature_map = ReadInfo.getMapDouble(Config.Public_Info+i+"\\", Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", ":", 0, 1);
+					Map<String,Double> feature_map = ReadInfo.getMapDouble(Config.TrainTestID+i+"\\", Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", ":", 0, 1);
 					Map<String,String> feature_dict = ReadInfo.getMap(Config.SrcPath_Root+"Config\\","Dict_"+classifername+".txt","\t",1,0);
 					List<String> feature_list = DecodeFeatureMap(feature_dict, feature_map);
-					SaveInfo.saveList(Config.Public_Info+"Decoded\\"+i+"\\",  Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", feature_list);
+					SaveInfo.saveList(Config.TrainTestID+"Decoded\\"+i+"\\",  Config.TRAIN_ID_SIZE+"_"+combination+labelid+"_"+classifername+"_"+TYPE+".txt", feature_list);
 				}
 			}
 		}

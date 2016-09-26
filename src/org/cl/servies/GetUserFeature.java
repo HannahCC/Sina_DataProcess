@@ -22,8 +22,8 @@ public class GetUserFeature {
 		classifer_user_map.clear();
 		for(String classifer : classifers){
 			ClassiferNode classifernode = new ClassiferNode();
-			classifernode.setClassifer_name(classifer.split("\\\\")[1]);
-			File f = new File(Config.SrcPath_Root+classifer+"_feature.txt");
+			classifernode.setClassifer_name(classifer);
+			File f = new File(Config.SrcPath_Root+classifer+".feature");
 			if(!f.exists()){
 				System.out.println(classifernode.getClassifer_name()+"has no feature!");
 				continue;
@@ -33,7 +33,7 @@ public class GetUserFeature {
 			String line = "";
 			while((line = r.readLine())!=null){
 				if(line.equals("")||!line.contains(":"))continue;
-				String[] item = line.split("\\s",2);
+				String[] item = line.split("\\s+",2);
 				res.put(item[0],item[1]);
 			}
 			int size = getFeatureSize(classifernode.getClassifer_name());
@@ -72,7 +72,7 @@ public class GetUserFeature {
 	
 	public static int getFeatureSize(String classfier) throws IOException{
 		int size = 0;
-		File f = new File(Config.SrcPath_Root+"\\Config\\Feature_Size.txt");
+		/*File f = new File(Config.SrcPath_Root+"\\Config\\Feature_Size.txt");
 		BufferedReader r = new BufferedReader(new FileReader(f));
 		String line = "";
 		while((line = r.readLine())!=null){
@@ -81,7 +81,7 @@ public class GetUserFeature {
 				if(items[0].equals(classfier)){size = Integer.parseInt(items[1]);break;}
 			}
 		}
-		r.close();
+		r.close();*/
 		return size;
 	}
 	

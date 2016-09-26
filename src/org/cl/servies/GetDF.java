@@ -42,7 +42,7 @@ public class GetDF {
 				ClassiferNode classifer = it.next();
 				Map<String, Double> feature_chi_map = new HashMap<String, Double>();
 				String classifername = classifer.getClassifer_name();
-				feature_chi_map = ReadInfo.getCHIMap(Config.Public_Info+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+labelid+"_"+classifername+"df.txt",":",0,1,DF_threshold);
+				feature_chi_map = ReadInfo.getCHIMap(Config.TrainTestID+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+labelid+"_"+classifername+"df.txt",":",0,1,DF_threshold);
 				if(feature_chi_map==null)return;//有些特征没有CHI值
 				I_DF.put(classifername, feature_chi_map);
 			}
@@ -72,7 +72,7 @@ public class GetDF {
 				Map<String, Integer> feature_DF_map = classifer_map.get(classifer_name);//得到当前类别用户文档中，各特征出现次数
 				List<String> feature_DF_list = new ArrayList<String>();
 				Utils.mapSortByValueInteger(feature_DF_list,feature_DF_map);
-				SaveInfo.saveList(Config.Public_Info, fold_i+"\\"+train_id_size+"_"+COMBINATION+labelid+"_"+classifer_name+"df.txt", feature_DF_list,feature_DF_list.size());
+				SaveInfo.saveList(Config.TrainTestID, fold_i+"\\"+train_id_size+"_"+COMBINATION+labelid+"_"+classifer_name+"df.txt", feature_DF_list,feature_DF_list.size());
 			}
 		}
 	}
@@ -88,7 +88,7 @@ public class GetDF {
 		int[] LABELS = Config.LABELS;
 		for(int labelid : LABELS){//不同类别用户                              
 			Map<String,Map<String, Integer>> classifer_map = new  HashMap<String,Map<String, Integer>>();
-			Set<String> train_id_set = ReadInfo.getSet(Config.Public_Info+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt");	
+			Set<String> train_id_set = ReadInfo.getSet(Config.TrainTestID+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt");	
 			Iterator<Entry<ClassiferNode, Map<String, String>>> it = classifer_user_map.entrySet().iterator();//{classifer_name:{uid:feature}}
 			while(it.hasNext()){
 				Map<String, Integer> feature_map = new HashMap<String, Integer>();//一类用户的一个分类器中，<特征编号,该特征出现在该类多少用户微博中>

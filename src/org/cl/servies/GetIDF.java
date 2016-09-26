@@ -44,7 +44,7 @@ public class GetIDF {
 			ClassiferNode classifer = it.next();
 			Map<String, Double> feature_idf_map = new HashMap<String, Double>();
 			String classifername = classifer.getClassifer_name();
-			feature_idf_map = ReadInfo.getMapDouble(Config.Public_Info+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+classifername+"_"+typename+"idf.txt",":",0,1);
+			feature_idf_map = ReadInfo.getMapDouble(Config.TrainTestID+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+classifername+"_"+typename+"idf.txt",":",0,1);
 			if(feature_idf_map==null)return;//有些特征没有IDF值
 			IDF.put(classifername, feature_idf_map);
 		}
@@ -64,8 +64,8 @@ public class GetIDF {
 		String typename = "";
 		Set<String> id_set = new TreeSet<String>();
 		for(int labelid:LABELS){
-			if(data_type==0){typename="test";ReadInfo.getSet(Config.Public_Info+fold_i+"\\",labelid+"_testingid.txt",id_set);}
-			else if(data_type==1){typename="train";ReadInfo.getSet(Config.Public_Info+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt",id_set);}
+			if(data_type==0){typename="test";ReadInfo.getSet(Config.TrainTestID+fold_i+"\\",labelid+"_testingid.txt",id_set);}
+			else if(data_type==1){typename="train";ReadInfo.getSet(Config.TrainTestID+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt",id_set);}
 		}
 
 		double N = id_set.size();
@@ -93,7 +93,7 @@ public class GetIDF {
 			}
 			List<String> feature_idf_list = new ArrayList<String>();
 			Utils.mapSortByValueDouble(feature_idf_list, feature_idf_map);
-			SaveInfo.saveList(Config.Public_Info,fold_i+"\\"+train_id_size+"_"+COMBINATION+classifer.getClassifer_name()+"_"+typename+"idf.txt", feature_idf_list);
+			SaveInfo.saveList(Config.TrainTestID,fold_i+"\\"+train_id_size+"_"+COMBINATION+classifer.getClassifer_name()+"_"+typename+"idf.txt", feature_idf_list);
 		}
 	}
 }

@@ -43,7 +43,7 @@ public class GetCHI {
 				ClassiferNode classifer = it.next();
 				Map<String, Double> feature_chi_map = new HashMap<String, Double>();
 				String classifername = classifer.getClassifer_name();
-				feature_chi_map = ReadInfo.getCHIMap(Config.Public_Info+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+labelid+"_"+classifername+"chi.txt",":",0,1,CHI_threshold);
+				feature_chi_map = ReadInfo.getCHIMap(Config.TrainTestID+fold_i+"\\", TRAIN_ID_SIZE+"_"+COMBINATION+labelid+"_"+classifername+"chi.txt",":",0,1,CHI_threshold);
 				if(feature_chi_map==null)return;//有些特征没有CHI值
 				I_CHI.put(classifername, feature_chi_map);
 			}
@@ -76,7 +76,7 @@ public class GetCHI {
 				NormalizeCHI(train_id_size,post_feature_map,nega_feature_map,feature_chi_map);
 				List<String> feature_chi_list = new ArrayList<String>();
 				Utils.mapSortByValueDouble(feature_chi_list,feature_chi_map,post_feature_map);
-				SaveInfo.saveList(Config.Public_Info, fold_i+"\\"+train_id_size+"_"+COMBINATION+labelid+"_"+classifer_name+"chi.txt", feature_chi_list,feature_chi_list.size());
+				SaveInfo.saveList(Config.TrainTestID, fold_i+"\\"+train_id_size+"_"+COMBINATION+labelid+"_"+classifer_name+"chi.txt", feature_chi_list,feature_chi_list.size());
 			}
 		}
 	}
@@ -92,7 +92,7 @@ public class GetCHI {
 		int[] LABELS = Config.LABELS;
 		for(int labelid : LABELS){//不同类别用户                              
 			Map<String,Map<String, Integer>> classifer_map = new  HashMap<String,Map<String, Integer>>();
-			Set<String> train_id_set = ReadInfo.getSet(Config.Public_Info+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt");	
+			Set<String> train_id_set = ReadInfo.getSet(Config.TrainTestID+fold_i+"\\", train_id_size+"_"+labelid+"_trainingid.txt");	
 			Iterator<Entry<ClassiferNode, Map<String, String>>> it = classifer_user_map.entrySet().iterator();//{classifer_name:{uid:feature}}
 			while(it.hasNext()){
 				Map<String, Integer> feature_map = new HashMap<String, Integer>();//一类用户的一个分类器中，<特征编号,该特征出现在该类多少用户微博中>

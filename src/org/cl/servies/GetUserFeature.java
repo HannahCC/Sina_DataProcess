@@ -48,10 +48,10 @@ public class GetUserFeature {
 		classifer_user_map.clear();
 		for(String classifer : classifers){
 			ClassiferNode classifernode = new ClassiferNode();
-			classifernode.setClassifer_name(classifer.split("\\\\")[1]);
-			File f = new File(Config.SrcPath_Root+classifer+"_"+fold+"_feature.txt");
+			classifernode.setClassifer_name(classifer);
+			File f = new File(Config.SrcPath_Root+classifer+".feature.f"+fold);
 			if(!f.exists()){
-				System.out.println(f.getName()+" is not exsit!");
+				System.out.println(classifernode.getClassifer_name()+"has no feature!");
 				continue;
 			}
 			Map<String, String> res = new HashMap<String, String>();

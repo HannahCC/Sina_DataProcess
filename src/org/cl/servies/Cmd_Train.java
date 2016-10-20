@@ -67,7 +67,6 @@ public class Cmd_Train {
 
 	public static void execute(String cmdStr) {
 		try {// svm-train .\1\training_data.txt
-
 			Runtime run = Runtime.getRuntime();
 			Process process = run.exec(cmdStr);
 			// 将调用结果打印到控制台上

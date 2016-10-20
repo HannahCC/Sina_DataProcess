@@ -396,10 +396,13 @@ public class SaveInfo {
 			for (String testid : testidSet) {
 				StringBuffer sb = new StringBuffer();
 				sb.append(testid + "\t");
+				boolean flag = false;
 				for (int c : Config.CLASSES) {
+					if(label_id_resultlist.get(c).get(testid)==null){flag=true;break;}
 					sb.append(c + ":" + label_id_resultlist.get(c).get(testid)
 							+ "\t");
 				}
+				if(flag){ continue;}
 				fw.write(sb.toString() + "\r\n");
 			}
 			fw.flush();

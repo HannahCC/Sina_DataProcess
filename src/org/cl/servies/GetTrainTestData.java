@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.cl.conf.Config;
 import org.cl.model.ClassNode;
@@ -38,6 +38,7 @@ public class GetTrainTestData {
 	public static void getTTData_UserLevel(Map<Integer, ClassNode> label_map) {
 		for(int labelid : Config.LABELS){
 			ClassNode classnode = label_map.get(labelid);
+			if(classnode==null) continue;
 			SaveInfo.option_log("--------------label-"+labelid+"-------------");
 			SaveInfo.option_log("------------------------Getting Testing Data--------------------");
 			getData_UserLevel(labelid,classnode.getTesting_id_set(),0);//获取测试数据

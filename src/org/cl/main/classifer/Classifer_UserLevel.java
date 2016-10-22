@@ -134,7 +134,7 @@ public class Classifer_UserLevel {
 		for (int i = 0; i < Config.FOLD; i++) {
 			SaveInfo.option_log("------------------------------------fold-" + i
 					+ "--------------------");
-			GetUserFeature.getUserFeatureMap(i);//每折的特征文件不一样
+			GetUserFeature.getUserFeatureMap(train_id_size,i);//每折的特征文件不一样
 			Config.ResPath = classifier_path + i + "\\";
 			SaveInfo.mkdir(Config.ResPath);
 			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(
@@ -151,7 +151,7 @@ public class Classifer_UserLevel {
 		for (int i = 0; i < Config.FOLD; i++) {
 			SaveInfo.option_log("------------------------fold-" + i
 					+ "--------------------");
-			GetUserFeature.getUserFeatureMap(i);
+			GetUserFeature.getUserFeatureMap(train_id_size,i);
 			Config.ResPath = Config.ResPath_Root + res_dir + "/" + dir + i
 					+ "/";
 			SaveInfo.mkdir(Config.ResPath);

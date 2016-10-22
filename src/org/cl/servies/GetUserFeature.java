@@ -44,12 +44,12 @@ public class GetUserFeature {
 		}
 	}
 
-	public static void getUserFeatureMap(int fold) throws IOException {
+	public static void getUserFeatureMap(int trainSize, int fold) throws IOException {
 		classifer_user_map.clear();
 		for(String classifer : classifers){
 			ClassiferNode classifernode = new ClassiferNode();
 			classifernode.setClassifer_name(classifer);
-			File f = new File(Config.SrcPath_Root+classifer+".feature.f"+fold);
+			File f = new File(Config.SrcPath_Root+classifer+".feature.t"+trainSize+"f"+fold);
 			if(!f.exists()){
 				System.out.println(classifernode.getClassifer_name()+"has no feature!");
 				continue;

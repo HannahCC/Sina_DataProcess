@@ -24,17 +24,19 @@ public class Classifer_UserLevel {
 	 * @throws InterruptedException
 	 */
 	static String res_dir = "";
+	static int start_class = -1;
 
 	public static void main(String[] args) throws IOException {
 		System.out
 				.println("----------------------------------------------------------");
 		int classnum = Integer.parseInt(args[1]);// label个数
-		int foldnum = Integer.parseInt(args[2]);
+		start_class = Integer.parseInt(args[2]);
+		int foldnum = Integer.parseInt(args[3]);
 		System.out.println("Config.RootPath : " + args[0]);
 		System.out.println("Config.CLASS_NUMBER : " + classnum);
 		System.out.println("Config.FOLD : " + foldnum);
 		System.out.print("trainPercent : ");
-		int idx = 3;
+		int idx = 4;
 		int train_size_num = Integer.parseInt(args[idx]);
 		int[] train_size_arr = new int[train_size_num];// 使用训练数据百分比
 		for (int i = 0; i < train_size_num; i++) {
@@ -79,7 +81,7 @@ public class Classifer_UserLevel {
 		 * SaveInfo.mkdir(Config.ResPath);
 		 */
 
-		//GetUserFeature.getUserFeatureMap();//每折特征文件一致
+		 GetUserFeature.getUserFeatureMap();// 每折特征文件一致
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
 		// cross_validation(Config.TRAIN_ID_SIZE,"");
 		/*---------------------------------每折用户的特征不相同-----------------------------------*/
@@ -134,7 +136,7 @@ public class Classifer_UserLevel {
 		for (int i = 0; i < Config.FOLD; i++) {
 			SaveInfo.option_log("------------------------------------fold-" + i
 					+ "--------------------");
-			GetUserFeature.getUserFeatureMap(train_id_size,i);//每折的特征文件不一样
+			//GetUserFeature.getUserFeatureMap(train_id_size, i);// 每折的特征文件不一样
 			Config.ResPath = classifier_path + i + "\\";
 			SaveInfo.mkdir(Config.ResPath);
 			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(
@@ -151,7 +153,7 @@ public class Classifer_UserLevel {
 		for (int i = 0; i < Config.FOLD; i++) {
 			SaveInfo.option_log("------------------------fold-" + i
 					+ "--------------------");
-			GetUserFeature.getUserFeatureMap(train_id_size,i);
+			GetUserFeature.getUserFeatureMap(train_id_size, i);
 			Config.ResPath = Config.ResPath_Root + res_dir + "/" + dir + i
 					+ "/";
 			SaveInfo.mkdir(Config.ResPath);
@@ -280,6 +282,8 @@ public class Classifer_UserLevel {
 			SaveInfo.option_log("------------------------train_id_size-" + size
 					+ "--------------------");
 			for (int class_i : Config.CLASSES) {
+				if (class_i < start_class)
+					continue;
 				SaveInfo.option_log("-----------------------------class_i-"
 						+ class_i + "-----------------");
 				cross_validation_mutiClassifier(size, class_i);

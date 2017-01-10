@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
-
+	
 	public static String RootPath = null; // 每个数据集实验结果的根目录
 	public static String SVMPath = null; // svm存放的目录
 	public static String UserID = null; // 该数据集的id-label
@@ -13,6 +13,7 @@ public class Config {
 	public static String ResPath_Root = null; // classifier 存放目录
 	public static String TrainTestID = null; // id 的划分
 	public static String ResPath = ResPath_Root; // 常变的结果目录
+	public static boolean isDel = false; //一个id因为不同label同时出现在测试数据和训练数据中时，是否将其从训练数据中删除
 
 	public static void init(String rootPath) {
 		RootPath = rootPath;

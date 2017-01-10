@@ -39,7 +39,7 @@ public class GetUserLabel {
 		Set<String> allId = new HashSet<String>();
 		for (int c : classType) {
 			String filename = sourcePath + c + ".txt";
-			Set<String> idset = ReadInfo.getSet("",filename);
+			Set<String> idset = ReadInfo.getSet("", filename);
 			allId.addAll(idset);
 			label_idset_map.put(c, idset);
 		}
@@ -71,7 +71,7 @@ public class GetUserLabel {
 			int fold) throws IOException {
 		for (int f = 0; f < fold; f++) {
 			String resPath = Config.ResPath_Root;
-			//SaveInfo.mkdir(resPath + feature + f + "/");
+			// SaveInfo.mkdir(resPath + feature + f + "/");
 			String filename = resPath + feature + f
 					+ "/allClassType_result.txt";
 			List<String> pre_result_list = ReadInfo.getneedlist(filename);
@@ -97,10 +97,9 @@ public class GetUserLabel {
 							public int compare(Map.Entry<String, Double> o1,
 									Map.Entry<String, Double> o2) {
 								if (o2.getValue() != null
-										&& o1.getValue() != null
-										&& o2.getValue().compareTo(
-												o1.getValue()) > 0) {
-									return 1;
+										&& o1.getValue() != null) {
+									return o2.getValue().compareTo(
+											o1.getValue());
 								} else {
 									return -1;
 								}
@@ -126,7 +125,7 @@ public class GetUserLabel {
 			String feature, int fold) throws IOException {
 		String resPath = Config.ResPath_Root;
 		for (int f = 0; f < fold; f++) {
-			//SaveInfo.mkdir(resPath + feature + f + "/");
+			// SaveInfo.mkdir(resPath + feature + f + "/");
 			String filename = resPath + feature + f
 					+ "/allClassType_result.txt";
 			List<String> pre_result_list = ReadInfo.getneedlist(filename);

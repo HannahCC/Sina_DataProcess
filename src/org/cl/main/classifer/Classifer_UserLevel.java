@@ -81,7 +81,7 @@ public class Classifer_UserLevel {
 		 * SaveInfo.mkdir(Config.ResPath);
 		 */
 
-		 GetUserFeature.getUserFeatureMap();// 每折特征文件一致
+		GetUserFeature.getUserFeatureMap();// 每折特征文件一致
 		/*-------普通情况，所有labels都进行比较-（默认CHI_threshold = 0.5;train_id_size=640）--------*/
 		// cross_validation(Config.TRAIN_ID_SIZE,"");
 		/*---------------------------------每折用户的特征不相同-----------------------------------*/
@@ -136,7 +136,7 @@ public class Classifer_UserLevel {
 		for (int i = 0; i < Config.FOLD; i++) {
 			SaveInfo.option_log("------------------------------------fold-" + i
 					+ "--------------------");
-			//GetUserFeature.getUserFeatureMap(train_id_size, i);// 每折的特征文件不一样
+			// GetUserFeature.getUserFeatureMap(train_id_size, i);// 每折的特征文件不一样
 			Config.ResPath = classifier_path + i + "\\";
 			SaveInfo.mkdir(Config.ResPath);
 			Map<Integer, ClassNode> label_map = GetTrainTestID.getTTID(
@@ -291,6 +291,7 @@ public class Classifer_UserLevel {
 			String foldname = "(train_" + size + "percent)/";
 			SaveInfo.getClassCombine(foldname, res_dir + "/");
 			GetUserLabel.getUserLabel(foldname + "combine_" + res_dir + "/");
+			Config.deleteFile(size, res_dir);
 		}
 	}
 }

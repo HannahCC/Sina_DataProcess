@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Config {
-	
+
 	public static String RootPath = null; // 每个数据集实验结果的根目录
 	public static String SVMPath = null; // svm存放的目录
 	public static String UserID = null; // 该数据集的id-label
@@ -13,12 +13,12 @@ public class Config {
 	public static String ResPath_Root = null; // classifier 存放目录
 	public static String TrainTestID = null; // id 的划分
 	public static String ResPath = ResPath_Root; // 常变的结果目录
-	public static boolean isDel = false; //一个id因为不同label同时出现在测试数据和训练数据中时，是否将其从训练数据中删除
+	public static boolean isDel = false; // 一个id因为不同label同时出现在测试数据和训练数据中时，是否将其从训练数据中删除
 
 	public static void init(String rootPath) {
 		RootPath = rootPath;
 		SVMPath = new File(rootPath).getParent() + "\\src\\SVM\\";
-		//SVMPath = rootPath + "src\\SVM\\";
+		// SVMPath = rootPath + "src\\SVM\\";
 		UserID = rootPath + "user_id\\";
 		SrcPath_Root = rootPath + "features\\";
 		ResPath_Root = rootPath + "classifiers\\";
@@ -92,4 +92,31 @@ public class Config {
 
 	}
 
+	public static void deleteFile(int train_size, String res_dir) {
+
+		for (int classNum : CLASSES) {
+			File dirnames = new File(ResPath_Root + "(train_" + train_size
+					+ "percent)\\class_" + classNum + "\\" + res_dir);
+			if (!dirnames.exists())
+				continue;
+
+			if (dirnames.isDirectory()) {
+				deleteDir(dirnames);
+			}
+
+		}
+	}
+
+	private static void deleteDir(File dir) {
+		System.out.println("deleting " + dir.getAbsolutePath());
+		File[] files = dir.listFiles();
+		for (File f : files) {
+			if (f.isDirectory()) {
+				deleteDir(f);
+			} else {
+				f.delete();
+			}
+		}
+		dir.delete();
+	}
 }
